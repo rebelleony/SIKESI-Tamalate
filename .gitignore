@@ -1,0 +1,37 @@
+# ============================================================
+#  .gitignore root — SI Kepegawaian & Presensi Tamalate
+#  Tujuan utama: mencegah PII data pegawai & rahasia masuk repo.
+#  CATATAN: *.csv TIDAK di-ignore (docs/sop-raw/*.csv adalah data SOP sah).
+# ============================================================
+
+# --- Data pegawai (PII): JANGAN pernah di-commit ---
+*.xlsx
+*.xls
+*.xlsm
+**/storage/app/imports/
+
+# --- Basis data runtime (bisa berisi PII riil setelah impor) ---
+*.sqlite
+*.sqlite-journal
+*.sqlite3
+*.db
+
+# --- Rahasia & konfigurasi lingkungan ---
+.env
+**/.env
+.env.*
+!**/.env.example
+
+# --- Dependensi & artefak build ---
+**/vendor/
+**/node_modules/
+**/public/build/
+**/public/hot
+**/public/storage
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
