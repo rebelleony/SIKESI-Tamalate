@@ -85,8 +85,8 @@
 
                 <!-- Info Banner -->
                 <div class="rounded-2xl border-l-4 border-gold bg-white/95 p-4 shadow-card text-xs text-slate-600 space-y-1">
-                    <p class="font-bold text-primary-900 text-sm">Alur Layanan Terpadu</p>
-                    <p>Pengajuan online mandiri → Verifikasi berkas staf arsip → Persetujuan berjenjang (Kasi/Kasubag → Sekcam → Camat) → SK / Surat Izin Resmi tercetak.</p>
+                    <p class="font-bold text-primary-900 text-sm">Alur Layanan 4 Tahap Berjenjang</p>
+                    <p>Pengajuan Mandiri (Pegawai) → Verifikasi Dokumen (Verifikator) → Persetujuan Tingkat Pertama (Kasi/Kasubag) → Persetujuan Akhir & Pengesahan (Camat/Lurah) → Surat / Dokumen Selesai.</p>
                 </div>
             </div>
 
@@ -120,7 +120,7 @@
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 </span>
-                                <input id="loginUsername" name="username" value="{{ old('username') }}" required autofocus
+                                <input id="loginUsername" name="login" value="{{ old('login') }}" required autofocus
                                        placeholder="Contoh: admin atau NIP"
                                        class="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
                             </div>
@@ -158,26 +158,23 @@
                     <div class="mt-6 pt-5 border-t border-slate-100">
                         <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2.5 flex items-center gap-1.5">
                             <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14H8a4 4 0 01-.82-7.916 4 4 0 017.64 0A4 4 0 0112 14z"/></svg>
-                            Pilih Akun Uji Coba (Demo):
+                            Pilih Akun Uji Coba (5 Role Utama):
                         </p>
-                        <div class="grid grid-cols-3 gap-1.5 text-xs">
-                            <button type="button" onclick="fillLogin('admin')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-semibold transition text-center truncate">
-                                Admin
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
+                            <button type="button" onclick="fillLogin('pegawai')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 text-slate-700 font-semibold transition text-center truncate">
+                                1. Pegawai / Staf
                             </button>
-                            <button type="button" onclick="fillLogin('verifikator')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-semibold transition text-center truncate">
-                                Verifikator
+                            <button type="button" onclick="fillLogin('operator')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-semibold transition text-center truncate">
+                                2. Operator
                             </button>
-                            <button type="button" onclick="fillLogin('kasi')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-semibold transition text-center truncate">
-                                Kasi/Kasubag
+                            <button type="button" onclick="fillLogin('kasi')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-purple-300 hover:bg-purple-50 text-slate-700 font-semibold transition text-center truncate">
+                                3. Kasi / Kasubag
                             </button>
-                            <button type="button" onclick="fillLogin('seksam')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-semibold transition text-center truncate">
-                                Sekcam
+                            <button type="button" onclick="fillLogin('camat')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-amber-300 hover:bg-amber-50 text-slate-700 font-semibold transition text-center truncate">
+                                4. Camat / Lurah
                             </button>
-                            <button type="button" onclick="fillLogin('camat')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-semibold transition text-center truncate">
-                                Camat
-                            </button>
-                            <button type="button" onclick="fillLogin('pegawai')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 font-semibold transition text-center truncate">
-                                Pegawai
+                            <button type="button" onclick="fillLogin('admin')" class="px-2 py-1.5 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-700 font-semibold transition text-center truncate col-span-2 sm:col-span-1">
+                                5. Super Admin
                             </button>
                         </div>
                     </div>

@@ -42,6 +42,12 @@
     <div class="grid md:grid-cols-2 gap-4">
         <div>
             <label class="block text-sm font-medium mb-1">Kode Arsip (tata naskah)</label>
+            <select id="pilih_klasifikasi" class="w-full border rounded px-3 py-2 mb-2 text-sm bg-slate-50" onchange="if(this.value){var p=this.value.split('|'); document.querySelector('[name=kode_arsip]').value=p[0]+'/'+(document.querySelector('[name=kode_arsip]').value||'ARSIP/{{ now()->year }}'); document.querySelector('[name=kategori]').value=p[1];}">
+                <option value="">— Pilih Referensi Kode Klasifikasi (Permendagri 83/2022) —</option>
+                @foreach($kodeKlasifikasi ?? [] as $kk)
+                    <option value="{{ $kk->kode }}|{{ $kk->nama }}">{{ $kk->kode }} — {{ $kk->nama }}</option>
+                @endforeach
+            </select>
             <input name="kode_arsip" value="{{ old('kode_arsip') }}" required placeholder="mis. 800/ASM/X/2026" class="w-full border rounded px-3 py-2">
         </div>
         <div>

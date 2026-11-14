@@ -38,9 +38,24 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
+        $coreRoles = ['pegawai', 'verifikator', 'kasi_kasubag', 'camat_lurah', 'super_admin'];
         $data = $request->validate($this->rules($role->id));
+        
+        // Cegah pengubahan nama 5 role inti sistem
+        if (in_array($role->nama_role, $coreRoles, true)) {
+            unset($data['nama_role']);
+        }
+
         $data['permissions'] = $this->parsePermissions($request->input('permissions_text'));
         $role->update($data);
+
+        \App\Models\AuditLog::catat(
+            $request->user()->id,
+            'ubah_role',
+            'role',
+            $role->id,
+            "Memperbarui peran {$role->nama_role}"
+        );
 
         return redirect()->route('admin.role.index')
             ->with('success', "Peran {$role->nama_role} diperbarui.");
@@ -48,12 +63,25 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
+        $coreRoles = ['pegawai', 'verifikator', 'kasi_kasubag', 'camat_lurah', 'super_admin'];
+        abort_if(in_array($role->nama_role, $coreRoles, true), 400,
+            '5 Role utama sistem (pegawai, verifikator, kasi_kasubag, camat_lurah, super_admin) tidak dapat dihapus.');
+
         abort_if($role->users()->exists(), 400,
             'Peran masih dipakai oleh pegawai; pindahkan mereka ke peran lain dahulu.');
 
+        $nama = $role->nama_role;
         $role->delete();
 
-        return back()->with('success', "Peran {$role->nama_role} dihapus.");
+        \App\Models\AuditLog::catat(
+            request()->user()->id,
+            'hapus_role',
+            'role',
+            $role->id,
+            "Menghapus peran {$nama}"
+        );
+
+        return back()->with('success', "Peran {$nama} dihapus.");
     }
 
     private function rules(?int $ignoreId = null): array

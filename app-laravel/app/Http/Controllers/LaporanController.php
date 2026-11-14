@@ -61,7 +61,7 @@ class LaporanController extends Controller
     private function filters(Request $request): array
     {
         $v = $request->validate([
-            'jenis' => ['required', 'in:' . implode(',', array_keys(self::JENIS))],
+            'jenis' => ['nullable', 'in:' . implode(',', array_keys(self::JENIS))],
             'dari' => ['nullable', 'date'],
             'sampai' => ['nullable', 'date'],
             'unit_kerja_id' => ['nullable', 'exists:unit_kerja,id'],
@@ -69,9 +69,9 @@ class LaporanController extends Controller
         ]);
 
         return [
-            'jenis' => $v['jenis'],
-            'dari' => $v['dari'] ?? Carbon::today()->startOfMonth()->toDateString(),
-            'sampai' => $v['sampai'] ?? Carbon::today()->toDateString(),
+            'jenis' => $v['jenis'] ?? array_key_first(self::JENIS),
+            'dari' => !empty($v['dari']) ? $v['dari'] : Carbon::today()->startOfMonth()->toDateString(),
+            'sampai' => !empty($v['sampai']) ? $v['sampai'] : Carbon::today()->toDateString(),
             'unitId' => isset($v['unit_kerja_id']) ? (int) $v['unit_kerja_id'] : null,
             'nip' => trim((string) ($v['nip'] ?? '')),
         ];

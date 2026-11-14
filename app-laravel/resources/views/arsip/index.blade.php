@@ -16,7 +16,7 @@
         </p>
     </div>
 
-    @if(auth()->user()->hasRole('verifikator','super_admin'))
+    @if(auth()->user()->hasRole('operator','super_admin'))
         <a href="{{ route('arsip.create') }}" 
            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-card transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>

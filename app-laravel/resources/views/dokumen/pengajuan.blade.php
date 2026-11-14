@@ -113,7 +113,20 @@
         <td class="ttdbox">
             <div>{{ $doc['ttd']['kota'] }}, {{ $doc['ttd']['tanggal'] }}</div>
             <div class="jab">{{ $doc['ttd']['jabatan'] }}</div>
-            <div class="ruang"></div>
+            @if(!empty($doc['digital_signature']))
+                <div style="border: 1.5px solid #059669; background: #ecfdf5; border-radius: 6px; padding: 6px 8px; margin: 8px 0; font-size: 8.5pt; text-align: left; line-height: 1.25;">
+                    <div style="font-weight: bold; color: #065f46; margin-bottom: 3px; font-size: 8pt;">
+                        &#10003; DITANDATANGANI ELEKTRONIK (BSrE)
+                    </div>
+                    <div style="color: #047857; font-size: 7.5pt;">
+                        Pejabat: <strong>{{ $doc['digital_signature']['pejabat_nama'] }}</strong><br>
+                        Waktu: {{ $doc['digital_signature']['waktu_wita'] }}<br>
+                        Token: <span style="font-family: monospace; font-size: 6.5pt;">{{ substr($doc['digital_signature']['token'], 0, 28) }}...</span>
+                    </div>
+                </div>
+            @else
+                <div class="ruang"></div>
+            @endif
             <div class="nama-ttd">{{ $doc['ttd']['nama'] ?? '.................................' }}</div>
             @if($doc['ttd']['nip'])<div>NIP. {{ $doc['ttd']['nip'] }}</div>@endif
         </td>

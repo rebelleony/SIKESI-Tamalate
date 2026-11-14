@@ -14,19 +14,30 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    /**
+     * Login dual-mode: NIP atau Username.
+     *
+     * Pegawai dapat masuk menggunakan NIP (18 digit) atau Username.
+     * Sistem mencoba mencocokkan kolom `username` terlebih dahulu,
+     * kemudian kolom `nip` jika tidak ditemukan via username.
+     */
     public function login(Request $request)
     {
         $cred = $request->validate([
-            'username' => ['required', 'string'],
+            'login'    => ['required', 'string'],   // bisa NIP atau username
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::with('role')->where('username', $cred['username'])->first();
+        // Cari user: coba username dulu, lalu NIP
+        $user = User::with('role')
+            ->where('username', $cred['login'])
+            ->orWhere('nip', $cred['login'])
+            ->first();
 
         if ($user && $user->terkunci_sampai && $user->terkunci_sampai->isFuture()) {
             return back()->withErrors([
-                'username' => 'Akun terkunci sementara. Coba lagi setelah ' . $user->terkunci_sampai->format('H:i') . '.',
-            ])->onlyInput('username');
+                'login' => 'Akun terkunci sementara. Coba lagi setelah ' . $user->terkunci_sampai->format('H:i') . '.',
+            ])->onlyInput('login');
         }
 
         if (! $user || ! $user->isAktif() || ! Hash::check($cred['password'], $user->password_hash)) {
@@ -39,8 +50,8 @@ class AuthController extends Controller
                 $user->save();
             }
             return back()->withErrors([
-                'username' => 'NIP/Username atau kata sandi salah.',
-            ])->onlyInput('username');
+                'login' => 'NIP/Username atau kata sandi salah.',
+            ])->onlyInput('login');
         }
 
         $user->forceFill(['login_gagal' => 0, 'terkunci_sampai' => null, 'last_login' => now()])->save();

@@ -1,0 +1,19 @@
+version: 1.0
+runtime: custom
+build:
+  commands:
+    build:
+      - echo "App Runner build initialized"
+run:
+  runtime-version: custom
+  command: /usr/local/bin/docker-entrypoint.sh apache2-foreground
+  network:
+    port: 80
+    env: PORT
+  health-check:
+    path: /up
+    interval: 10
+    timeout: 5
+    healthy-threshold: 2
+    unhealthy-threshold: 3
+

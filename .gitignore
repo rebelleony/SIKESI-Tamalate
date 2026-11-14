@@ -21,6 +21,8 @@
 **/.env
 .env.*
 !**/.env.example
+!**/.env.aws.example
+!**/.env.azure.example
 
 # --- Dependensi & artefak build ---
 **/vendor/

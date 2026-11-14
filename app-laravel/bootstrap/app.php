@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\PppkParuhWaktuMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -12,8 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
-            'role' => RoleMiddleware::class,
+            'role'              => RoleMiddleware::class,
+            'pppk_paruh_waktu'  => PppkParuhWaktuMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -120,7 +120,7 @@
             </tbody>
         </table>
     </div>
-    @if(method_exists($rows, 'links'))
+    @if(is_object($rows) && method_exists($rows, 'links'))
         <div class="px-6 py-4 border-t border-slate-100">
             {{ $rows->links() }}
         </div>

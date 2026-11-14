@@ -134,11 +134,13 @@
                     @php
                         $isDashboard = request()->routeIs('dashboard');
                         $isPengajuan = request()->routeIs('pengajuan.*');
+                        $isKepegawaian = request()->routeIs('kepegawaian.*');
                         $isPresensi = request()->routeIs('presensi.*');
-                        $isSurat = request()->routeIs('surat.*');
+                        $isSurat = request()->routeIs('surat.*') || request()->routeIs('surat-keluar.*') || request()->routeIs('surat-mandiri.*');
                         $isArsip = request()->routeIs('arsip.*');
                         $isLaporan = request()->routeIs('laporan.*');
-                        $isAdmin = request()->routeIs('admin.*');
+                        $isAdmin = request()->routeIs('admin.master') || (request()->routeIs('admin.*') && !request()->routeIs('admin.distribusi.*'));
+                        $isDistribusi = request()->routeIs('admin.distribusi.*');
                         $isProfil = request()->routeIs('profil.*');
                     @endphp
 
@@ -161,10 +163,19 @@
                             <div class="absolute left-0 top-full mt-1 w-48 bg-white border border-blue-100 rounded-xl shadow-lift py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
                                 <a href="{{ route('pengajuan.index') }}" class="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-primary-700">Daftar Pengajuan Saya</a>
                                 <a href="{{ route('pengajuan.create') }}" class="block px-4 py-2 text-xs font-semibold text-primary-700 bg-blue-50/50 hover:bg-blue-100">
-                                    + Buat Pengajuan Baru
+                                    Buat Pengajuan Baru
                                 </a>
                             </div>
                         </div>
+                    @endif
+
+                    <!-- Layanan Kepegawaian (Cuti, KGB, Pangkat, Pensiun) -->
+                    @if(!auth()->user()->hasRole('pegawai') || auth()->user()->berhakLayanan())
+                        <a href="{{ route('kepegawaian.index') }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isKepegawaian ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span>Kepegawaian</span>
+                        </a>
                     @endif
 
                     <!-- Presensi Apel -->
@@ -174,23 +185,40 @@
                         <span>Presensi Apel</span>
                     </a>
 
-                    <!-- Surat Masuk & Disposisi -->
-                    @if(auth()->user()->hasRole('verifikator','seksam','camat_lurah','super_admin'))
-                        <a href="{{ route('surat.index') }}" 
-                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isSurat ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
-                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            <span>Surat Masuk</span>
-                        </a>
+                    <!-- Persuratan & Arsip Dinamis -->
+                    @if(auth()->user()->hasRole('operator','verifikator_pimpinan','pimpinan','super_admin'))
+                        <div class="relative group">
+                            <a href="{{ route('surat.index') }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isSurat ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                <span>Persuratan</span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </a>
+                            <div class="absolute left-0 top-full mt-1 w-56 bg-white border border-blue-100 rounded-xl shadow-lift py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                                <a href="{{ route('surat.index') }}" class="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-primary-700">Buku Agenda Surat Masuk</a>
+                                <a href="{{ route('surat-keluar.index') }}" class="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-primary-700">Buku Agenda Surat Keluar</a>
+                                <a href="{{ route('surat-mandiri.index') }}" class="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-primary-700">Antrean Surat Mandiri</a>
+                                <div class="my-1 border-t border-slate-100"></div>
+                                <a href="{{ route('surat-mandiri.portal') }}" target="_blank" class="block px-4 py-2 text-xs font-semibold text-primary-700 hover:bg-blue-50">Portal Layanan Mandiri ↗</a>
+                                <a href="{{ route('surat-mandiri.tracking') }}" target="_blank" class="block px-4 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50">Tracking Surat Publik ↗</a>
+                            </div>
+                        </div>
 
                         <a href="{{ route('arsip.index') }}" 
                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isArsip ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
                             <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                             <span>Arsip Dokumen</span>
                         </a>
+                    @elseif(auth()->user()->hasRole('pegawai'))
+                        <a href="{{ route('surat-mandiri.portal') }}" target="_blank"
+                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-primary-700 hover:bg-slate-100/80 transition-all duration-150">
+                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span>Surat Mandiri</span>
+                        </a>
                     @endif
 
                     <!-- Laporan & Rekap -->
-                    @if(auth()->user()->hasRole('verifikator','super_admin'))
+                    @if(auth()->user()->hasRole('operator','super_admin'))
                         <a href="{{ route('laporan.index') }}" 
                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isLaporan ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
                             <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
@@ -198,8 +226,14 @@
                         </a>
                     @endif
 
-                    <!-- Data Master (Super Admin) -->
+                    <!-- Distribusi Hasil (Super Admin) -->
                     @if(auth()->user()->hasRole('super_admin'))
+                        <a href="{{ route('admin.distribusi.index') }}" 
+                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isDistribusi ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Distribusi Hasil</span>
+                        </a>
+
                         <a href="{{ route('admin.master') }}" 
                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isAdmin ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
                             <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -273,14 +307,15 @@
                 <a href="{{ route('pengajuan.create') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-primary-700 hover:bg-blue-50">+ Buat Pengajuan Baru</a>
             @endif
             <a href="{{ route('presensi.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isPresensi ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Presensi Apel</a>
-            @if(auth()->user()->hasRole('verifikator','seksam','camat_lurah','super_admin'))
+            @if(auth()->user()->hasRole('operator','pimpinan','super_admin'))
                 <a href="{{ route('surat.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isSurat ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Surat Masuk</a>
                 <a href="{{ route('arsip.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isArsip ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Arsip Dokumen</a>
             @endif
-            @if(auth()->user()->hasRole('verifikator','super_admin'))
+            @if(auth()->user()->hasRole('operator','super_admin'))
                 <a href="{{ route('laporan.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isLaporan ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Laporan & Rekap</a>
             @endif
             @if(auth()->user()->hasRole('super_admin'))
+                <a href="{{ route('admin.distribusi.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isDistribusi ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Distribusi Hasil</a>
                 <a href="{{ route('admin.master') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isAdmin ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Data Master</a>
             @endif
             <a href="{{ route('profil.show') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isProfil ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Profil Saya</a>
@@ -336,7 +371,7 @@
         @endif
 
         <!-- Flash Errors Notification -->
-        @if($errors->any())
+        @if(isset($errors) && $errors->any())
             <div class="mb-6 p-4 rounded-xl2 bg-rose-50 border border-rose-200 text-rose-900 shadow-sm">
                 <div class="flex items-center gap-2 mb-2 font-bold text-sm text-rose-800">
                     <svg class="h-5 w-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>

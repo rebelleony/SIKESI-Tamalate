@@ -10,14 +10,14 @@
             Area Mandiri Pegawai
         </div>
         <h1 class="text-2xl sm:text-3xl font-display font-extrabold text-primary-950">
-            Selamat Datang, {{ auth()->user()->nama }}
+            Selamat Datang, {{ auth()->user()?->nama ?? 'Pegawai' }}
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-            NIP: {{ auth()->user()->nip ?: '-' }} · Unit: {{ optional(auth()->user()->unitKerja)->nama ?? 'Kecamatan Tamalate' }}
+            NIP: {{ auth()->user()?->nip ?: '-' }} · Unit: {{ optional(auth()->user()?->unitKerja)->nama ?? 'Kecamatan Tamalate' }}
         </p>
     </div>
 
-    @if(auth()->user()->berhakLayanan())
+    @if(auth()->user()?->berhakLayanan())
         <div class="flex items-center gap-2">
             <a href="{{ route('pengajuan.create') }}" 
                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-card transition">
@@ -30,22 +30,38 @@
 
 <!-- Highlight Stat Cards (Turikale Style) -->
 <div class="grid md:grid-cols-2 gap-5 mb-8">
+    @php
+        $pagi = $presensiHariIni->get('pagi');
+        $sore = $presensiHariIni->get('sore');
+        $sudahPresensi = $presensiHariIni->isNotEmpty();
+    @endphp
     <!-- Presensi Apel Card -->
-    <div class="rounded-2xl border border-blue-100 bg-white p-6 shadow-card hover:shadow-lift transition-all border-l-4 {{ $presensiHariIni ? 'border-l-emerald-500' : 'border-l-amber-500' }}">
+    <div class="rounded-2xl border border-blue-100 bg-white p-6 shadow-card hover:shadow-lift transition-all border-l-4 {{ $sudahPresensi ? 'border-l-emerald-500' : 'border-l-amber-500' }}">
         <div class="flex items-start justify-between">
             <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Presensi Apel Hari Ini</p>
-                <div class="mt-2 flex items-center gap-2.5">
-                    @if($presensiHariIni)
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            Sudah Presensi
+                <div class="mt-2.5 flex items-center gap-2 flex-wrap">
+                    @if($pagi)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Pagi: {{ ucfirst($pagi->status_validasi) }} ({{ \Carbon\Carbon::parse($pagi->jam)->format('H:i') }})
                         </span>
-                        <span class="text-xs text-slate-500">({{ $presensiHariIni->status_validasi }})</span>
                     @else
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                            Belum Presensi
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            Pagi: Belum
+                        </span>
+                    @endif
+
+                    @if($sore)
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Sore: {{ ucfirst($sore->status_validasi) }} ({{ \Carbon\Carbon::parse($sore->jam)->format('H:i') }})
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            Sore: Belum
                         </span>
                     @endif
                 </div>
@@ -83,7 +99,7 @@
             </div>
         </div>
         <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-            @if(auth()->user()->berhakLayanan())
+            @if(auth()->user()?->berhakLayanan())
                 <a href="{{ route('pengajuan.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-700 hover:text-primary-800 hover:underline">
                     Lihat Semua Riwayat Pengajuan
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -102,7 +118,7 @@
             <h2 class="font-display font-extrabold text-base text-primary-950">Pengajuan Terbaru</h2>
             <p class="text-xs text-slate-500">Daftar berkas permohonan kepegawaian yang baru diajukan</p>
         </div>
-        @if(auth()->user()->berhakLayanan())
+        @if(auth()->user()?->berhakLayanan())
             <a href="{{ route('pengajuan.index') }}" class="text-xs font-bold text-primary-700 hover:underline">
                 Lihat Semua
             </a>

@@ -15,7 +15,7 @@
     </p>
 </div>
 
-<div class="grid md:grid-cols-3 gap-6 mb-8">
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Pegawai / Akun -->
     <a href="{{ route('admin.pegawai.index') }}" 
        class="rounded-2xl border border-blue-100 bg-white p-6 shadow-card hover:shadow-lift transition-all block group border-l-4 border-l-blue-600 hover:-translate-y-0.5">
@@ -58,9 +58,25 @@
             </div>
         </div>
         <div class="text-3xl font-display font-black text-amber-950 mt-3">{{ $totalRole }}</div>
-        <div class="font-display font-extrabold text-base text-slate-800 mt-1">Peran (Role)</div>
+        <div class="font-display font-extrabold text-base text-slate-800 mt-1">5 Role Utama</div>
         <div class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-            Hak akses berjenjang: Super Admin, Verifikator, Kasi/Kasubag, Seksam, Camat/Lurah, dan Pegawai.
+            Struktur RBAC berjenjang: Super Admin, Operator, Verifikator Pimpinan, Pimpinan, dan Pegawai / Staf.
+        </div>
+    </a>
+
+    <!-- Kode Klasifikasi Arsip -->
+    <a href="{{ route('admin.klasifikasi.index') }}"
+       class="rounded-2xl border border-blue-100 bg-white p-6 shadow-card hover:shadow-lift transition-all block group border-l-4 border-l-indigo-600 hover:-translate-y-0.5">
+        <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Persuratan Dinamis</span>
+            <div class="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            </div>
+        </div>
+        <div class="text-3xl font-display font-black text-indigo-950 mt-3">{{ \App\Models\KodeKlasifikasi::count() }}</div>
+        <div class="font-display font-extrabold text-base text-slate-800 mt-1">Kode Klasifikasi</div>
+        <div class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+            Standar Permendagri No. 83 Tahun 2022 (000, 400, 600, 800, 900).
         </div>
     </a>
 </div>

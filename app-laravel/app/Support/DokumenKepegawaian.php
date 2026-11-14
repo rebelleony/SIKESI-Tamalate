@@ -46,6 +46,15 @@ class DokumenKepegawaian
             'data'       => self::dataPegawai($p, $pegawai, $d),
             'tembusan'   => self::tembusan($p->jenis_layanan),
             'ttd'        => self::penandatangan($p),
+            'digital_signature' => $p->isDitandatangani() ? [
+                'token' => $p->tanda_tangan_token,
+                'waktu' => $p->tanda_tangan_waktu,
+                'waktu_wita' => $p->tanda_tangan_waktu ? $p->tanda_tangan_waktu->timezone('Asia/Makassar')->format('d/m/Y H:i') . ' WITA' : '-',
+                'pejabat_nama' => $p->tandaTanganPejabat->nama ?? ($p->tanda_tangan_payload['penandatangan']['nama'] ?? '-'),
+                'pejabat_nip' => $p->tandaTanganPejabat->nip ?? ($p->tanda_tangan_payload['penandatangan']['nip'] ?? '-'),
+                'pejabat_jabatan' => $p->tandaTanganPejabat->jabatan ?? ($p->tanda_tangan_payload['penandatangan']['jabatan'] ?? 'Camat/Lurah'),
+                'url_verifikasi' => url('/dokumen/verifikasi/' . $p->tanda_tangan_token),
+            ] : null,
         ];
     }
 
@@ -230,15 +239,17 @@ class DokumenKepegawaian
         $camatRoleId = Role::where('nama_role', 'camat_lurah')->value('id');
         $camat = $camatRoleId ? User::where('role_id', $camatRoleId)->orderBy('id')->first() : null;
 
-        $nama = $cfg['nama'] ?: ($camat->nama ?? null);
-        $nip  = $cfg['nip']  ?: ($camat->nip ?? null);
+        $pejabat = $p->tandaTanganPejabat;
+        $nama = $pejabat ? $pejabat->nama : ($cfg['nama'] ?: ($camat->nama ?? null));
+        $nip  = $pejabat ? $pejabat->nip : ($cfg['nip'] ?: ($camat->nip ?? null));
+        $jabatan = $pejabat ? ($pejabat->jabatan ?: $cfg['jabatan']) : $cfg['jabatan'];
 
-        // Tanggal tanda tangan: waktu persetujuan akhir bila ada, selain itu hari ini.
-        $final = $p->riwayat->first(fn ($r) => $r->tahap === 'final' && $r->keputusan === 'setuju');
-        $waktu = $final ? $final->waktu : null;
+        // Tanggal tanda tangan: waktu persetujuan akhir / tanda tangan bila ada, selain itu hari ini.
+        $final = $p->riwayat->first(fn ($r) => $r->tahap === 'approval_final' && $r->keputusan === 'setuju');
+        $waktu = $p->tanda_tangan_waktu ?? ($final ? $final->waktu : null);
 
         return [
-            'jabatan' => $cfg['jabatan'],
+            'jabatan' => $jabatan,
             'nama'    => $nama,
             'nip'     => $nip,
             'kota'    => config('dokumen.kota_ttd'),

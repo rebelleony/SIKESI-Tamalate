@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Arsip;
+use App\Models\KodeKlasifikasi;
 use App\Models\Pengajuan;
 use App\Models\SuratMasuk;
 use App\Models\User;
@@ -26,8 +27,9 @@ class ArsipController extends Controller
                 ->orderByDesc('tanggal_terima')->get(),
             'pengajuan' => Pengajuan::whereIn('status', Pengajuan::STATUS_SELESAI)
                 ->orderByDesc('id')->get(),
-            'penandatangan' => User::whereHas('role', fn ($q) => $q->whereIn('nama_role', ['seksam', 'camat_lurah']))
+            'penandatangan' => User::whereHas('role', fn ($q) => $q->whereIn('nama_role', ['pimpinan', 'verifikator_pimpinan']))
                 ->orderBy('nama')->get(),
+            'kodeKlasifikasi' => KodeKlasifikasi::orderBy('kode')->get(),
             'statusDokumen' => Arsip::STATUS_DOKUMEN,
             'lokasi' => Arsip::LOKASI,
         ]);

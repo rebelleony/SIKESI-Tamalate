@@ -1,0 +1,95 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: si-kepegawaian-tamalate:latest
+    container_name: tamalate_app
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      APP_NAME: "${APP_NAME:-SI Kepegawaian Tamalate}"
+      APP_ENV: "${APP_ENV:-production}"
+      APP_KEY: "${APP_KEY:-base64:4YAIZ+lxuXrTb7wjHeAA9WvlW2b5smipOWaqmwOL8VM=}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_URL: "${APP_URL:-https://yourdomain.com}"
+      APP_TIMEZONE: "Asia/Makassar"
+      LOG_CHANNEL: "stack"
+      LOG_STACK: "single"
+      LOG_LEVEL: "error"
+      
+      DB_CONNECTION: "${DB_CONNECTION:-mysql}"
+      DB_HOST: "${DB_HOST:-db}"
+      DB_PORT: "${DB_PORT:-3306}"
+      DB_DATABASE: "${DB_DATABASE:-si_kepegawaian_tamalate}"
+      DB_USERNAME: "${DB_USERNAME:-tamalate_user}"
+      DB_PASSWORD: "${DB_PASSWORD:-tamalate_secret_2026}"
+      
+      RUN_MIGRATIONS: "${RUN_MIGRATIONS:-true}"
+      RUN_SEEDER: "${RUN_SEEDER:-true}"
+      
+      SESSION_DRIVER: "file"
+      CACHE_STORE: "file"
+      FILESYSTEM_DISK: "local"
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_database:/var/www/html/database
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - tamalate_net
+
+  db:
+    image: mysql:8.0
+    container_name: tamalate_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-root_secret_2026}"
+      MYSQL_DATABASE: "${DB_DATABASE:-si_kepegawaian_tamalate}"
+      MYSQL_USER: "${DB_USERNAME:-tamalate_user}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-tamalate_secret_2026}"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - tamalate_net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  nginx:
+    image: nginx:alpine
+    container_name: tamalate_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_conf:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    depends_on:
+      - app
+    networks:
+      - tamalate_net
+
+volumes:
+  app_storage:
+    name: tamalate_app_storage
+  app_database:
+    name: tamalate_app_database
+  db_data:
+    name: tamalate_db_data
+  certbot_conf:
+    name: tamalate_certbot_conf
+  certbot_www:
+    name: tamalate_certbot_www
+
+networks:
+  tamalate_net:
+    driver: bridge
+

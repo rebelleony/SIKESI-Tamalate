@@ -1,9 +1,14 @@
-
 .git
 .gitignore
+.github
 .env
 .env.*
 !app-laravel/.env.example
 node_modules
 app-laravel/node_modules
 app-laravel/vendor
+diagrams/
+docs/
+tatus
+*.md
+setup-ec2.sh

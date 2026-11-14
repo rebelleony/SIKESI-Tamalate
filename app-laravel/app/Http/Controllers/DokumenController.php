@@ -12,16 +12,20 @@ class DokumenController extends Controller
 {
     /**
      * Render SK / surat izin pengajuan menjadi PDF.
-     * Hanya untuk pengajuan yang sudah berstatus final (selesai).
+     * Dapat diunduh oleh Pegawai setelah didistribusikan (selesai), 
+     * atau dipratinjau oleh Super Admin setelah ditandatangani.
      */
     public function pengajuan(Request $request, Pengajuan $pengajuan)
     {
         $this->authorize($request, $pengajuan);
 
+        $siapCetak = in_array($pengajuan->status, Pengajuan::STATUS_SELESAI, true)
+            || ($request->user()->hasRole('super_admin') && $pengajuan->status === 'disetujui_dan_ditandatangani');
+
         abort_unless(
-            in_array($pengajuan->status, Pengajuan::STATUS_SELESAI, true),
-            400,
-            'Dokumen baru dapat dicetak setelah pengajuan berstatus selesai/disetujui.'
+            $siapCetak,
+            403,
+            'Dokumen resmi baru dapat dicetak/diunduh setelah pengajuan selesai didistribusikan oleh Super Admin.'
         );
 
         $doc = DokumenKepegawaian::untuk($pengajuan);
@@ -36,11 +40,24 @@ class DokumenController extends Controller
             : $pdf->stream($nama);
     }
 
+    /**
+     * Halaman Publik Verifikasi Tanda Tangan Digital & Keaslian Dokumen SIKESI Tamalate.
+     * Dapat diakses bebas oleh siapa saja yang memindai QR code pada dokumen fisik/digital.
+     */
+    public function verifikasi(string $token)
+    {
+        $pengajuan = Pengajuan::with(['pegawai.unitKerja', 'tandaTanganPejabat', 'distribusiAdmin'])
+            ->where('tanda_tangan_token', $token)
+            ->firstOrFail();
+
+        return view('dokumen.verifikasi', compact('pengajuan'));
+    }
+
     private function authorize(Request $request, Pengajuan $pengajuan): void
     {
         $user = $request->user();
         $boleh = $pengajuan->pegawai_id === $user->id
-            || $user->hasRole('verifikator', 'kasi_kasubag', 'seksam', 'camat_lurah', 'super_admin');
+            || $user->hasRole('operator', 'verifikator_pimpinan', 'pimpinan', 'super_admin');
 
         abort_unless($boleh, 403, 'Anda tidak berhak mengakses dokumen ini.');
     }

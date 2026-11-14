@@ -1,0 +1,55 @@
+name: Deploy to Microsoft Azure
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  # Opsi A: Deploy ke Azure Web App for Containers
+  deploy-app-service:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.AZURE_WEBAPP_NAME != '' }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and Push Docker Image to Azure Container Registry (ACR)
+        if: ${{ secrets.ACR_LOGIN_SERVER != '' }}
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/tamalate-app:${{ github.sha }} -f Dockerfile .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/tamalate-app:${{ github.sha }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          images: '${{ secrets.ACR_LOGIN_SERVER }}/tamalate-app:${{ github.sha }}'
+
+  # Opsi B: Deploy ke Azure Virtual Machine (VM) via SSH
+  deploy-azure-vm:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.AZURE_VM_HOST != '' }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy ke Azure VM via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME || 'azureuser' }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          port: ${{ secrets.AZURE_VM_PORT || 22 }}
+          script: |
+            cd ~/SIKESI-Tamalate
+            git pull origin main
+            docker compose up -d --build
+            docker image prune -f
+

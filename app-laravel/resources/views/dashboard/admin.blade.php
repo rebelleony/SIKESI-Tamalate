@@ -16,16 +16,24 @@
         </p>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 flex-wrap">
+        <a href="{{ route('admin.distribusi.index') }}" 
+           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-card transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+            <span>Distribusi Hasil Layanan</span>
+            @if($menungguDistribusi > 0)
+                <span class="px-2 py-0.5 rounded-full text-xs bg-white text-emerald-900 font-extrabold">{{ $menungguDistribusi }}</span>
+            @endif
+        </a>
         <a href="{{ route('admin.master') }}" 
-           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-card transition">
+           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-card transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            Kelola Data Master (UC-03)
+            Data Master (UC-03)
         </a>
     </div>
 </div>
 
-<!-- 4 Key Stat Cards (Turikale Style) -->
+<!-- 4 Key Stat Cards -->
 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
     <!-- Pegawai Aktif -->
     <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-card hover:shadow-lift transition-all border-l-4 border-l-blue-600">
@@ -33,7 +41,7 @@
             <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pegawai Terdaftar</p>
                 <div class="mt-2 text-3xl font-display font-black text-primary-950">{{ $totalPegawai }}</div>
-                <p class="text-xs text-slate-500 mt-1">ASN & PPPK</p>
+                <p class="text-xs text-slate-500 mt-1">ASN & PPPK ({{ $pegawaiAktif }} aktif)</p>
             </div>
             <div class="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -55,27 +63,27 @@
         </div>
     </div>
 
-    <!-- Menunggu Verifikasi -->
+    <!-- Siap Didistribusikan (Disetujui & TTD Pejabat) -->
     <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-card hover:shadow-lift transition-all border-l-4 border-l-amber-500">
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Menunggu Verifikasi</p>
-                <div class="mt-2 text-3xl font-display font-black text-amber-700">{{ $menungguVerifikasi }}</div>
-                <p class="text-xs text-slate-500 mt-1">Antrean staf arsip</p>
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Siap Didistribusikan</p>
+                <div class="mt-2 text-3xl font-display font-black text-amber-700">{{ $menungguDistribusi }}</div>
+                <p class="text-xs text-slate-500 mt-1">Ditandatangani Camat/Lurah</p>
             </div>
             <div class="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
             </div>
         </div>
     </div>
 
-    <!-- Disetujui Selesai -->
+    <!-- Selesai / Terdistribusi -->
     <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-card hover:shadow-lift transition-all border-l-4 border-l-emerald-500">
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Disetujui / Selesai</p>
-                <div class="mt-2 text-3xl font-display font-black text-emerald-700">{{ $disetujui }}</div>
-                <p class="text-xs text-slate-500 mt-1">SK / Izin diterbitkan</p>
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Selesai / Terdistribusi</p>
+                <div class="mt-2 text-3xl font-display font-black text-emerald-700">{{ $totalSelesai }}</div>
+                <p class="text-xs text-slate-500 mt-1">SK/Hasil diterima pegawai</p>
             </div>
             <div class="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -85,22 +93,74 @@
 </div>
 
 <!-- Quick Link Banner for UC-03 Master -->
-<div class="rounded-2xl border border-blue-100 bg-white p-6 shadow-card">
+<div class="rounded-2xl border border-blue-100 bg-white p-6 shadow-card mb-8">
     <h3 class="font-display font-bold text-base text-primary-950 mb-2">Pintasan Manajemen Data Master (UC-03)</h3>
     <p class="text-xs text-slate-500 mb-4">Akses cepat modul kepegawaian dan organisasi:</p>
     <div class="grid sm:grid-cols-3 gap-3">
         <a href="{{ route('admin.pegawai.index') }}" class="p-4 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-blue-50/60 hover:border-blue-200 transition block">
             <span class="block font-bold text-sm text-slate-800">Kelola Akun Pegawai</span>
-            <span class="block text-xs text-slate-500 mt-0.5">Tambah, ubah data, atur atasan & reset sandi</span>
+            <span class="block text-xs text-slate-500 mt-0.5">Tambah, ubah data, atur unit kerja & reset sandi</span>
         </a>
         <a href="{{ route('admin.unit.index') }}" class="p-4 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-blue-50/60 hover:border-blue-200 transition block">
             <span class="block font-bold text-sm text-slate-800">Kelola Unit Kerja</span>
             <span class="block text-xs text-slate-500 mt-0.5">Kecamatan, 11 Kelurahan & Seksi</span>
         </a>
         <a href="{{ route('admin.role.index') }}" class="p-4 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-blue-50/60 hover:border-blue-200 transition block">
-            <span class="block font-bold text-sm text-slate-800">Kelola Hak Akses / Peran</span>
-            <span class="block text-xs text-slate-500 mt-0.5">Struktur RBAC alur verifikasi SOP</span>
+            <span class="block font-bold text-sm text-slate-800">Kelola 5 Role Utama</span>
+            <span class="block text-xs text-slate-500 mt-0.5">RBAC: Pegawai, Verifikator, Kasi/Kasubag, Camat/Lurah, Super Admin</span>
         </a>
+    </div>
+</div>
+
+<!-- Log Aktivitas Sistem (Audit Log) -->
+<div class="rounded-2xl border border-blue-100 bg-white shadow-card overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+            <h3 class="font-display font-extrabold text-base text-primary-950">Log Pemantauan Administratif (Audit Log)</h3>
+            <p class="text-xs text-slate-500">Catatan aktivitas sensitif pengguna sistem secara real-time</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">
+            Aktivitas Terkini
+        </span>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-blue-50/60 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-blue-100">
+                <tr>
+                    <th class="py-3 px-6">Waktu</th>
+                    <th class="py-3 px-4">Pengguna</th>
+                    <th class="py-3 px-4">Tindakan</th>
+                    <th class="py-3 px-6">Keterangan</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @forelse($recentLogs as $log)
+                <tr class="hover:bg-blue-50/30 transition">
+                    <td class="py-3.5 px-6 font-mono text-xs text-slate-500 whitespace-nowrap">
+                        {{ $log->waktu ? $log->waktu->format('d/m/Y H:i') : '-' }}
+                    </td>
+                    <td class="py-3.5 px-4 font-semibold text-slate-800 text-xs whitespace-nowrap">
+                        {{ $log->user->nama ?? ($log->user->username ?? 'Sistem') }}
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800 font-mono">
+                            {{ $log->aksi }}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-6 text-xs text-slate-600">
+                        {{ $log->deskripsi }}
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="4" class="py-8 text-center text-slate-400 text-xs">
+                        Belum ada aktivitas tercatat di audit log.
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </div>
 @endsection

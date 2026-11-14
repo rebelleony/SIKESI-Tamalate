@@ -97,6 +97,14 @@ class PegawaiController extends Controller
 
         $user = User::create($data);
 
+        \App\Models\AuditLog::catat(
+            $request->user()->id,
+            'tambah_pegawai',
+            'user',
+            $user->id,
+            "Menambahkan pegawai baru: {$user->nama} (NIP: {$user->nip})"
+        );
+
         return redirect()->route('admin.pegawai.index')
             ->with('success', "Pegawai {$user->nama} berhasil ditambahkan.");
     }
@@ -132,6 +140,14 @@ class PegawaiController extends Controller
 
         $pegawai->update($data);
 
+        \App\Models\AuditLog::catat(
+            $request->user()->id,
+            'ubah_pegawai',
+            'user',
+            $pegawai->id,
+            "Memperbarui data pegawai: {$pegawai->nama} (NIP: {$pegawai->nip})"
+        );
+
         return redirect()->route('admin.pegawai.index')
             ->with('success', "Data {$pegawai->nama} diperbarui.");
     }
@@ -146,10 +162,20 @@ class PegawaiController extends Controller
                 'Tidak dapat menonaktifkan super admin aktif terakhir.');
             $pegawai->update(['status' => 'nonaktif']);
             $pesan = "Akun {$pegawai->nama} dinonaktifkan.";
+            $aksi = 'nonaktifkan_akun';
         } else {
             $pegawai->update(['status' => 'aktif']);
             $pesan = "Akun {$pegawai->nama} diaktifkan kembali.";
+            $aksi = 'aktifkan_akun';
         }
+
+        \App\Models\AuditLog::catat(
+            $request->user()->id,
+            $aksi,
+            'user',
+            $pegawai->id,
+            $pesan
+        );
 
         return back()->with('success', $pesan);
     }
@@ -159,6 +185,14 @@ class PegawaiController extends Controller
     {
         $request->validate(['password_baru' => ['required', 'string', 'min:8']]);
         $pegawai->update(['password_hash' => Hash::make($request->password_baru)]);
+
+        \App\Models\AuditLog::catat(
+            $request->user()->id,
+            'reset_password',
+            'user',
+            $pegawai->id,
+            "Mereset kata sandi untuk akun {$pegawai->nama} ({$pegawai->username})"
+        );
 
         return back()->with('success', "Kata sandi {$pegawai->nama} berhasil direset.");
     }
