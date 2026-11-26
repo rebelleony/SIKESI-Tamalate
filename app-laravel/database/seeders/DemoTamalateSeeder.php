@@ -378,7 +378,6 @@ class DemoTamalateSeeder extends Seeder
                     'tanggal_selesai' => now()->addDays(7)->toDateString(),
                     'lama_hari'       => 3,
                     'alasan'          => 'Keperluan keluarga di luar kota',
-                    'alamat_cuti'     => 'Jl. Dg Tata Raya, Makassar',
                     'no_hp'           => '081241009988',
                 ],
                 'logs' => [
@@ -423,7 +422,6 @@ class DemoTamalateSeeder extends Seeder
                     'tanggal_selesai' => now()->subDays(9)->toDateString(),
                     'lama_hari'       => 2,
                     'alasan'          => 'Rawat jalan sesuai surat keterangan dokter',
-                    'alamat_cuti'     => 'Jl. Alauddin, Tamalate, Makassar',
                     'no_hp'           => '081355667788',
                 ],
                 'logs' => [

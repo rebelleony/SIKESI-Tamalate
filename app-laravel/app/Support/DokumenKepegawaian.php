@@ -214,7 +214,6 @@ class DokumenKepegawaian
                 'Jenis Cuti'            => \App\Models\JenisCuti::find($d['jenis_cuti_id'] ?? null)?->nama ?? '-',
                 'Lama Cuti'             => ($d['lama_hari'] ?? '-') . ' hari',
                 'Periode Cuti'          => self::tglPanjang($d['tanggal_mulai'] ?? null) . ' s.d. ' . self::tglPanjang($d['tanggal_selesai'] ?? null),
-                'Alamat Selama Cuti'    => $d['alamat_cuti'] ?? '-',
             ],
             default => [],
         };

@@ -10,6 +10,8 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -69,16 +71,33 @@ class PresensiController extends Controller
         $data = $request->validate([
             'status_kehadiran' => ['nullable', 'in:hadir,izin,dinas_luar'],
             'keterangan'       => ['nullable', 'string', 'max:500'],
-            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:3072'],
+            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'foto_base64'      => ['nullable', 'string'],
         ]);
 
         $statusKehadiran = $data['status_kehadiran'] ?? 'hadir';
+        $hasUploadedFoto = $request->hasFile('foto');
+        $hasBase64Foto = filled($data['foto_base64'] ?? null);
 
-        if ($statusKehadiran === 'hadir' && ! $request->hasFile('foto')) {
-            return back()->withErrors(['foto' => 'Foto kehadiran di barisan apel wajib diambil/diunggah untuk status Hadir.']);
+        if ($statusKehadiran === 'hadir' && ! $hasUploadedFoto && ! $hasBase64Foto) {
+            return back()
+                ->withErrors(['foto' => 'Foto kehadiran di barisan apel wajib diambil dari kamera browser atau diunggah untuk status Hadir.'])
+                ->withInput();
         }
         if (in_array($statusKehadiran, ['izin', 'dinas_luar'], true) && blank($data['keterangan'] ?? null)) {
-            return back()->withErrors(['keterangan' => 'Keterangan wajib diisi untuk pengajuan Izin / Dinas Luar.']);
+            return back()
+                ->withErrors(['keterangan' => 'Keterangan wajib diisi untuk pengajuan Izin / Dinas Luar.'])
+                ->withInput();
+        }
+
+        $decodedBase64 = null;
+        if (! $hasUploadedFoto && $hasBase64Foto) {
+            $decodedBase64 = $this->parseBase64Image($data['foto_base64']);
+            if ($decodedBase64 === null) {
+                return back()
+                    ->withErrors(['foto' => 'Format foto dari kamera browser tidak valid atau melebihi batas 4 MB.'])
+                    ->withInput();
+            }
         }
 
         $sudah = PresensiApel::where('pegawai_id', $user->id)
@@ -88,8 +107,11 @@ class PresensiController extends Controller
         abort_if($sudah, 400, "Anda sudah melakukan presensi apel {$sesi} hari ini.");
 
         $path = null;
-        if ($request->hasFile('foto')) {
+        if ($hasUploadedFoto) {
             $path = $request->file('foto')->store('presensi/' . now()->format('Y/m/d'), 'public');
+        } elseif ($decodedBase64 !== null) {
+            $path = 'presensi/' . now()->format('Y/m/d') . '/' . Str::uuid() . '.' . $decodedBase64['ext'];
+            Storage::disk('public')->put($path, $decodedBase64['binary']);
         }
 
         $now = now();
@@ -402,5 +424,31 @@ class PresensiController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Decode dan validasi data URL base64 hasil tangkapan kamera browser.
+     */
+    private function parseBase64Image(string $dataUrl): ?array
+    {
+        if (! preg_match('/^data:image\/(jpeg|jpg|png|webp);base64,(.+)$/s', trim($dataUrl), $matches)) {
+            return null;
+        }
+
+        $binary = base64_decode($matches[2], true);
+        if ($binary === false || strlen($binary) === 0 || strlen($binary) > 4 * 1024 * 1024) {
+            return null;
+        }
+
+        if (@getimagesizefromstring($binary) === false) {
+            return null;
+        }
+
+        $ext = strtolower($matches[1]) === 'jpeg' ? 'jpg' : strtolower($matches[1]);
+
+        return [
+            'ext'    => $ext,
+            'binary' => $binary,
+        ];
     }
 }

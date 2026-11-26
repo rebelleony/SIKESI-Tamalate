@@ -52,10 +52,6 @@
             </div>
         </div>
         <div>
-            <label class="block text-sm font-medium mb-1">Alamat Selama Cuti</label>
-            <input name="alamat_cuti" value="{{ old('alamat_cuti') }}" class="w-full border rounded px-3 py-2">
-        </div>
-        <div>
             <label class="block text-sm font-medium mb-1">No. Telepon</label>
             <input name="no_telp" value="{{ old('no_telp', $pegawai->no_telp) }}" class="w-full border rounded px-3 py-2">
         </div>
@@ -125,7 +121,11 @@
         </div>
     </fieldset>
 
-    <div>
+    <div class="space-y-2">
+        <div class="rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 flex items-center justify-between gap-2 text-xs">
+            <span class="text-slate-700">Butuh contoh surat permohonan atau template Word/PDF?</span>
+            <a href="{{ route('template-surat.index') }}" target="_blank" class="font-bold text-blue-700 hover:underline shrink-0">Unduh Template Surat ↗</a>
+        </div>
         <label class="block text-sm font-medium mb-1">Berkas Persyaratan (PDF/JPG/PNG, maks 2MB tiap file)</label>
         <input type="file" name="berkas[]" multiple required class="w-full text-sm">
     </div>

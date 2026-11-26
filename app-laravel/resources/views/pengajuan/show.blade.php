@@ -116,7 +116,6 @@
                     'Alasan' => $d['alasan'] ?? '-',
                     'Lama' => ($d['lama_hari'] ?? '-') . ' hari',
                     'Periode' => ($d['tanggal_mulai'] ?? '-') . ' s/d ' . ($d['tanggal_selesai'] ?? '-'),
-                    'Alamat Selama Cuti' => $d['alamat_cuti'] ?? '-',
                     'No. Telepon' => $d['no_telp'] ?? '-',
                 ],
                 'kgb' => [

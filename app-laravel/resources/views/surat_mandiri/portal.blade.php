@@ -23,6 +23,9 @@
                 </div>
             </div>
             <div class="flex items-center gap-2 text-xs font-semibold">
+                <a href="{{ route('template-surat.index') }}" class="px-3 py-2 rounded-lg bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100 transition">
+                    Template Surat
+                </a>
                 <a href="{{ route('surat-mandiri.tracking') }}" class="px-3 py-2 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 transition">
                     Lacak Kode Tracking
                 </a>

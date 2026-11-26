@@ -48,15 +48,9 @@
             <label class="block text-sm font-semibold text-slate-700 mb-1">Alasan Cuti</label>
             <textarea name="alasan" rows="2" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">{{ old('alasan') }}</textarea>
         </div>
-        <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Alamat Selama Menjalankan Cuti</label>
-                <input name="alamat_cuti" value="{{ old('alamat_cuti') }}" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">No. Telp / HP</label>
-                <input name="no_telp" value="{{ old('no_telp', $pegawai->no_hp) }}" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
-            </div>
+        <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">No. Telp / HP</label>
+            <input name="no_telp" value="{{ old('no_telp', $pegawai->no_hp) }}" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
         </div>
     </div>
 
@@ -147,6 +141,12 @@
 
     <!-- Upload Lampiran Digital (PDF max 5MB) -->
     <div class="border-t border-slate-100 pt-4 space-y-3">
+        <div class="rounded-xl bg-blue-50/80 border border-blue-200 px-3.5 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <span class="text-slate-700">Belum punya format surat? Lihat contoh pengisian &amp; unduh template resmi (.DOCX / .PDF).</span>
+            <a href="{{ route('template-surat.index') }}" target="_blank" class="font-bold text-primary-700 hover:underline shrink-0">
+                Buka Template Surat ↗
+            </a>
+        </div>
         <div class="flex items-center justify-between">
             <label class="block text-sm font-semibold text-slate-700">Unggah Persyaratan Digital (PDF, maks. 5MB per file) <span class="text-rose-600">*</span></label>
             <button type="button" onclick="tambahLampiran()" class="text-xs font-bold text-primary-700 hover:underline">+ Tambah File</button>

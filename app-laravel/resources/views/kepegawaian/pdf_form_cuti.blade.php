@@ -76,11 +76,10 @@
     </table>
 
     <table>
-        <tr><td colspan="4" class="sec-title">IV. ALAMAT SELAMA MENJALANKAN CUTI</td></tr>
+        <tr><td colspan="2" class="sec-title">IV. KONTAK SELAMA MENJALANKAN CUTI</td></tr>
         <tr>
-            <td width="65%">{{ $d['alamat_cuti'] ?? '-' }}</td>
-            <td width="12%">Telp/HP</td>
-            <td width="23%">{{ $d['no_telp'] ?? '-' }}</td>
+            <td width="25%">Telp / HP Aktif</td>
+            <td width="75%">{{ $d['no_telp'] ?? $d['no_hp'] ?? '-' }}</td>
         </tr>
     </table>
 
@@ -90,18 +89,43 @@
             <td width="50%">Status Pemrosesan: <strong>{{ $p->labelStatus() }}</strong></td>
             <td width="50%">Posisi Meja: <strong>{{ $p->meja_saat_ini }}</strong></td>
         </tr>
+        @if(!empty($signatures['lurah']))
+        <tr>
+            <td colspan="2" style="background:#f0fdf4;">
+                <strong>Persetujuan Lurah (Elektronik):</strong> Disetujui oleh {{ $signatures['lurah']['nama'] }} (NIP. {{ $signatures['lurah']['nip'] }}) pada {{ $signatures['lurah']['waktu_wita'] }} · Token: <span style="font-family:monospace;font-size:9px;">{{ substr($signatures['lurah']['token'], 0, 24) }}...</span>
+            </td>
+        </tr>
+        @endif
     </table>
 
     <table class="ttd-box">
         <tr>
             <td>
                 Mengetahui,<br>
-                Camat Tamalate<br><br><br><br>
-                <u>( ________________________ )</u>
+                Camat Tamalate<br>
+                @if(!empty($signatures['camat']))
+                    <div style="border:1.5px solid #059669; background:#ecfdf5; border-radius:4px; padding:6px 8px; margin:8px 18px; font-size:9px; text-align:left; line-height:1.3;">
+                        <div style="font-weight:bold; color:#065f46; margin-bottom:2px;">&#10003; DITANDATANGANI ELEKTRONIK</div>
+                        <div style="color:#047857;">
+                            Pejabat: <strong>{{ $signatures['camat']['nama'] }}</strong><br>
+                            Waktu: {{ $signatures['camat']['waktu_wita'] }}<br>
+                            Token: <span style="font-family:monospace; font-size:8px;">{{ substr($signatures['camat']['token'], 0, 24) }}...</span>
+                        </div>
+                    </div>
+                    <u><strong>{{ $signatures['camat']['nama'] }}</strong></u><br>
+                    NIP. {{ $signatures['camat']['nip'] }}
+                @else
+                    <div style="margin:18px 0; color:#6b7280; font-size:9px;">(Menunggu Tanda Tangan Elektronik Camat)</div>
+                    <u>( ________________________ )</u>
+                @endif
             </td>
             <td>
                 Hormat Saya,<br>
-                Pemohon<br><br><br><br>
+                Pemohon<br>
+                <div style="margin:10px 18px; padding:5px; border:1px dashed #64748b; font-size:8.5px; color:#334155;">
+                    Diajukan secara elektronik<br>
+                    {{ optional($p->created_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') }} WITA
+                </div>
                 <u><strong>{{ $pegawai->nama ?? '-' }}</strong></u><br>
                 NIP. {{ $pegawai->nip ?? '-' }}
             </td>
