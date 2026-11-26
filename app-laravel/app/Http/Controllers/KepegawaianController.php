@@ -167,7 +167,10 @@ class KepegawaianController extends Controller
 
         $kepegawaian->load(['pegawai.unitKerja', 'unitKerja', 'lampiran', 'logs.aktor']);
 
-        return view('kepegawaian.show', ['p' => $kepegawaian]);
+        return view('kepegawaian.show', [
+            'p'          => $kepegawaian,
+            'signatures' => $this->buildDigitalSignatures($kepegawaian),
+        ]);
     }
 
     public function proses(Request $request, PengajuanKepegawaian $kepegawaian)
@@ -334,7 +337,10 @@ class KepegawaianController extends Controller
 
         $kepegawaian->load(['pegawai.unitKerja', 'unitKerja', 'logs.aktor']);
 
-        $pdf = Pdf::loadView('kepegawaian.pdf_form_cuti', ['p' => $kepegawaian])
+        $pdf = Pdf::loadView('kepegawaian.pdf_form_cuti', [
+            'p'          => $kepegawaian,
+            'signatures' => $this->buildDigitalSignatures($kepegawaian),
+        ])
             ->setPaper('a4')
             ->setOption('defaultFont', 'DejaVu Sans');
 
@@ -459,7 +465,6 @@ class KepegawaianController extends Controller
                 'tanggal_mulai'   => ['required', 'date'],
                 'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
                 'alasan'          => ['required', 'string', 'max:500'],
-                'alamat_cuti'     => ['required', 'string', 'max:255'],
                 'no_telp'         => ['required', 'string', 'max:25'],
             ]);
             $lamaHari = Carbon::parse($d['tanggal_mulai'])->diffInDays(Carbon::parse($d['tanggal_selesai'])) + 1;
@@ -521,6 +526,48 @@ class KepegawaianController extends Controller
         };
 
         abort_unless($allowed, 403, 'Anda tidak memiliki kewenangan memproses berkas pada meja ini.');
+    }
+
+    /**
+     * Ekstrak tanda tangan elektronik Lurah & Camat dari log persetujuan resmi.
+     */
+    private function buildDigitalSignatures(PengajuanKepegawaian $p): array
+    {
+        $secret = config('app.key') ?: 'sikesi-tamalate-key';
+        $result = ['lurah' => null, 'camat' => null];
+
+        $mapStage = [
+            'approval_lurah' => 'lurah',
+            'approval_camat' => 'camat',
+        ];
+
+        foreach ($p->logs as $log) {
+            if ($log->aksi !== 'setuju' || ! isset($mapStage[$log->status_dari])) {
+                continue;
+            }
+            $slot = $mapStage[$log->status_dari];
+            $aktor = $log->aktor;
+            $waktu = $log->waktu;
+            $token = hash_hmac('sha256', implode('|', [
+                'kepegawaian',
+                $p->id,
+                $p->nomor_pengajuan,
+                $slot,
+                $log->aktor_id,
+                $aktor?->nip ?? '',
+                optional($waktu)->timestamp ?? 0,
+            ]), $secret);
+
+            $result[$slot] = [
+                'nama'       => $aktor?->nama ?? ($slot === 'camat' ? 'Camat Tamalate' : 'Lurah'),
+                'nip'        => $aktor?->nip ?? '-',
+                'jabatan'    => $aktor?->jabatan ?? ($slot === 'camat' ? 'Camat Tamalate' : 'Lurah'),
+                'waktu_wita' => $waktu ? $waktu->timezone('Asia/Makassar')->format('d/m/Y H:i') . ' WITA' : '-',
+                'token'      => $token,
+            ];
+        }
+
+        return $result;
     }
 }
 

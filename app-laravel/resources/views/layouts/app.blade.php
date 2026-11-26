@@ -136,7 +136,7 @@
                         $isPengajuan = request()->routeIs('pengajuan.*');
                         $isKepegawaian = request()->routeIs('kepegawaian.*');
                         $isPresensi = request()->routeIs('presensi.*');
-                        $isSurat = request()->routeIs('surat.*') || request()->routeIs('surat-keluar.*') || request()->routeIs('surat-mandiri.*');
+                        $isSurat = request()->routeIs('surat.*') || request()->routeIs('surat-keluar.*') || request()->routeIs('surat-mandiri.*') || request()->routeIs('template-surat.*');
                         $isArsip = request()->routeIs('arsip.*');
                         $isLaporan = request()->routeIs('laporan.*');
                         $isAdmin = request()->routeIs('admin.master') || (request()->routeIs('admin.*') && !request()->routeIs('admin.distribusi.*'));
@@ -201,6 +201,7 @@
                                 <div class="my-1 border-t border-slate-100"></div>
                                 <a href="{{ route('surat-mandiri.portal') }}" target="_blank" class="block px-4 py-2 text-xs font-semibold text-primary-700 hover:bg-blue-50">Portal Layanan Mandiri ↗</a>
                                 <a href="{{ route('surat-mandiri.tracking') }}" target="_blank" class="block px-4 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50">Tracking Surat Publik ↗</a>
+                                <a href="{{ route('template-surat.index') }}" class="block px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">Contoh &amp; Template Surat</a>
                             </div>
                         </div>
 
@@ -214,6 +215,10 @@
                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-primary-700 hover:bg-slate-100/80 transition-all duration-150">
                             <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             <span>Surat Mandiri</span>
+                        </a>
+                        <a href="{{ route('template-surat.index') }}"
+                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ request()->routeIs('template-surat.*') ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
+                            <span>Template Surat</span>
                         </a>
                     @endif
 
@@ -307,6 +312,7 @@
                 <a href="{{ route('pengajuan.create') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-primary-700 hover:bg-blue-50">+ Buat Pengajuan Baru</a>
             @endif
             <a href="{{ route('presensi.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isPresensi ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Presensi Apel</a>
+            <a href="{{ route('template-surat.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ request()->routeIs('template-surat.*') ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Template Surat</a>
             @if(auth()->user()->hasRole('operator','pimpinan','super_admin'))
                 <a href="{{ route('surat.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isSurat ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Surat Masuk</a>
                 <a href="{{ route('arsip.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isArsip ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Arsip Dokumen</a>

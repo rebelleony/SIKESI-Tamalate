@@ -49,7 +49,6 @@ class LayananKepegawaian
                 'lama_hari' => ['required', 'integer', 'min:1'],
                 'tanggal_mulai' => ['required', 'date'],
                 'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
-                'alamat_cuti' => ['required', 'string', 'max:255'],
                 'no_telp' => ['required', 'string', 'max:20'],
             ],
             'kgb' => [
@@ -117,7 +116,6 @@ class LayananKepegawaian
                 'lama_hari' => $in['lama_hari'],
                 'tanggal_mulai' => $in['tanggal_mulai'],
                 'tanggal_selesai' => $in['tanggal_selesai'],
-                'alamat_cuti' => $in['alamat_cuti'],
                 'no_telp' => $in['no_telp'],
             ],
             'kgb' => [

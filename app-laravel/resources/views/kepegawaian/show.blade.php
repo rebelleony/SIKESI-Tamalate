@@ -164,9 +164,10 @@
                         <textarea name="catatan" rows="3" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm"></textarea>
                     </div>
                     <div class="grid grid-cols-1 gap-2">
+                        @php $isSignStage = in_array($p->status, ['approval_lurah', 'approval_camat'], true); @endphp
                         <button type="submit" name="aksi" value="setuju"
                                 class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
-                            ✓ Setujui & Teruskan ke Meja Berikutnya
+                            {{ $isSignStage ? '✓ Setujui & Terbitkan Tanda Tangan Elektronik' : '✓ Setujui & Teruskan ke Meja Berikutnya' }}
                         </button>
                         <button type="submit" name="aksi" value="revisi"
                                 class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl text-sm transition">
@@ -191,6 +192,21 @@
                     <textarea name="catatan" rows="2" placeholder="Keterangan perbaikan..." class="w-full border border-amber-200 rounded-xl px-3 py-2 text-xs"></textarea>
                     <button class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-xl text-xs">Kirim Ulang Revisi</button>
                 </form>
+            </div>
+        @endif
+
+        @if(!empty($signatures['camat']) || !empty($signatures['lurah']))
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-card space-y-2.5">
+                <h2 class="font-display font-bold text-sm text-emerald-950">✓ Tanda Tangan Elektronik Terbit</h2>
+                @foreach(['lurah' => 'Lurah', 'camat' => 'Camat Tamalate'] as $slot => $labelPejabat)
+                    @if(!empty($signatures[$slot]))
+                        <div class="bg-white/90 rounded-xl p-3 border border-emerald-100 text-xs space-y-0.5">
+                            <div class="font-bold text-emerald-900">{{ $labelPejabat }}: {{ $signatures[$slot]['nama'] }}</div>
+                            <div class="text-slate-600">NIP. {{ $signatures[$slot]['nip'] }} · {{ $signatures[$slot]['waktu_wita'] }}</div>
+                            <div class="font-mono text-[10px] text-emerald-800 break-all">Token: {{ $signatures[$slot]['token'] }}</div>
+                        </div>
+                    @endif
+                @endforeach
             </div>
         @endif
 

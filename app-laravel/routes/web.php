@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\SuratKeluarController;
 use App\Http\Controllers\SuratMandiriController;
 use App\Http\Controllers\SuratMasukController;
+use App\Http\Controllers\TemplateSuratController;
 use App\Http\Controllers\Admin\DistribusiPengajuanController;
 use App\Http\Controllers\Admin\KodeKlasifikasiController;
 use App\Http\Controllers\Admin\MasterController;
@@ -30,6 +31,15 @@ Route::get('/dokumen/verifikasi/{token}', [DokumenController::class, 'verifikasi
 Route::get('/layanan-surat', [SuratMandiriController::class, 'portal'])->name('surat-mandiri.portal');
 Route::post('/layanan-surat', [SuratMandiriController::class, 'submitPortal'])->name('surat-mandiri.submit');
 Route::get('/tracking-surat', [SuratMandiriController::class, 'tracking'])->name('surat-mandiri.tracking');
+
+// Contoh Form Surat di Web & Pusat Unduh Template (.docx / .pdf)
+Route::get('/template-surat', [TemplateSuratController::class, 'index'])->name('template-surat.index');
+Route::get('/template-surat/{jenis}/unduh/{format}', [TemplateSuratController::class, 'downloadBlank'])
+    ->whereIn('format', ['pdf', 'docx'])
+    ->name('template-surat.download');
+Route::post('/template-surat/{jenis}/ekspor/{format}', [TemplateSuratController::class, 'exportFilled'])
+    ->whereIn('format', ['pdf', 'docx'])
+    ->name('template-surat.export');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
