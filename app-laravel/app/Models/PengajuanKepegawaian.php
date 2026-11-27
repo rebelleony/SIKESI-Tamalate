@@ -46,6 +46,13 @@ class PengajuanKepegawaian extends Model
         '800.1.11.7' => 'Cuti di Luar Tanggungan Negara',
     ];
 
+    public const KODE_CUTI_PPPK = [
+        '800.1.11.2' => 'Cuti Tahunan',
+        '800.1.11.4' => 'Cuti Sakit',
+        '800.1.11.5' => 'Cuti Melahirkan',
+        'cuti_bersama' => 'Cuti Bersama',
+    ];
+
     public const STATUS_LABELS = [
         'verifikasi_operator_kelurahan' => 'Verifikasi Operator Kelurahan',
         'approval_lurah'                => 'Persetujuan / TTD Lurah',

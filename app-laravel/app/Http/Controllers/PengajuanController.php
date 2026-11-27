@@ -6,9 +6,12 @@ use App\Models\AuditLog;
 use App\Models\Berkas;
 use App\Models\JenisCuti;
 use App\Models\Pengajuan;
+use App\Models\PengajuanKepegawaian;
+use App\Models\PengajuanSuratMandiri;
 use App\Models\RiwayatApproval;
 use App\Support\LayananKepegawaian;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,41 +21,72 @@ class PengajuanController extends Controller
     {
         $user = $request->user();
 
-        // Pegawai hanya dapat melihat pengajuan miliknya sendiri
+        $qSop = Pengajuan::with(['pegawai.unitKerja', 'unitKerja'])->latest();
+        $qKep = PengajuanKepegawaian::with(['pegawai.unitKerja', 'unitKerja'])->latest();
+        $qMandiri = PengajuanSuratMandiri::latest();
+
         if ($user->hasRole('pegawai')) {
-            $pengajuan = Pengajuan::with('unitKerja')
-                ->where('pegawai_id', $user->id)
-                ->latest()->paginate(10);
-            return view('pengajuan.index', compact('pengajuan'));
+            $qSop->where('pegawai_id', $user->id);
+            $qKep->where('pegawai_id', $user->id);
+            $qMandiri->where('user_id', $user->id);
+        } elseif ($user->hasRole('verifikator_pimpinan')) {
+            $qSop->whereIn('status', ['menunggu_approval_tier1', 'menunggu_approval_final', 'disetujui', 'ditolak_tier1']);
+            $qMandiri->where('id', 0); // Surat mandiri tidak melalui Kasi/Kasubag
+        } elseif ($user->hasRole('pimpinan') && $user->unitKerja && $user->unitKerja->tipe === 'kelurahan') {
+            $qSop->where('unit_kerja_id', $user->unit_kerja_id);
+            $qKep->where('unit_kerja_id', $user->unit_kerja_id);
+            $qMandiri->where('unit_asal', $user->unitKerja->nama);
         }
 
-        // Verifikator melihat antrean pengajuan
-        if ($user->hasRole('operator')) {
-            $pengajuan = Pengajuan::with('pegawai.unitKerja')
-                ->latest()->paginate(15);
-            return view('pengajuan.index', compact('pengajuan'));
-        }
+        $items = collect()
+            ->merge($qSop->get()->map(fn ($p) => [
+                'nomor'        => $p->nomor_ajuan ?? '-',
+                'pemohon'      => $p->pegawai->nama ?? '-',
+                'unit'         => $p->unitKerja->nama ?? ($p->pegawai->unitKerja->nama ?? '-'),
+                'layanan'      => ucfirst(str_replace('_', ' ', $p->jenis_layanan)),
+                'sumber'       => 'Pengajuan SOP',
+                'status_label' => $p->labelStatus(),
+                'tanggal'      => optional($p->tanggal_ajuan)->format('d/m/Y') ?? optional($p->created_at)->format('d/m/Y'),
+                'url'          => route('pengajuan.show', $p),
+                'sort_at'      => $p->created_at?->timestamp ?? 0,
+            ]))
+            ->merge($qKep->get()->map(fn ($k) => [
+                'nomor'        => $k->nomor_pengajuan,
+                'pemohon'      => $k->pegawai->nama ?? '-',
+                'unit'         => $k->unitKerja->nama ?? ($k->pegawai->unitKerja->nama ?? '-'),
+                'layanan'      => $k->labelJenis(),
+                'sumber'       => 'Kepegawaian',
+                'status_label' => $k->labelStatus(),
+                'tanggal'      => optional($k->created_at)->format('d/m/Y'),
+                'url'          => route('kepegawaian.show', $k),
+                'sort_at'      => $k->created_at?->timestamp ?? 0,
+            ]))
+            ->merge($qMandiri->get()->map(fn ($m) => [
+                'nomor'        => $m->kode_tracking,
+                'pemohon'      => $m->nama_pemohon,
+                'unit'         => $m->unit_asal,
+                'layanan'      => $m->jenis_surat . ' — ' . $m->perihal,
+                'sumber'       => 'Surat Mandiri',
+                'status_label' => $m->labelStatus(),
+                'tanggal'      => optional($m->created_at)->format('d/m/Y'),
+                'url'          => $user->hasRole('pegawai')
+                    ? route('surat-mandiri.tracking', ['kode' => $m->kode_tracking])
+                    : route('surat-mandiri.index', ['q' => $m->kode_tracking]),
+                'sort_at'      => $m->created_at?->timestamp ?? 0,
+            ]))
+            ->sortByDesc('sort_at')
+            ->values();
 
-        // Kasi / Kasubag melihat pengajuan tahap 1 atau yang terkait
-        if ($user->hasRole('verifikator_pimpinan')) {
-            $pengajuan = Pengajuan::with('pegawai.unitKerja')
-                ->whereIn('status', ['menunggu_approval_tier1', 'menunggu_approval_final', 'disetujui', 'ditolak_tier1'])
-                ->latest()->paginate(15);
-            return view('pengajuan.index', compact('pengajuan'));
-        }
+        $perPage = 15;
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $pengajuan = new LengthAwarePaginator(
+            $items->forPage($page, $perPage)->values(),
+            $items->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
-        // Camat / Lurah melihat pengajuan tahap akhir atau seluruh unitnya
-        if ($user->hasRole('pimpinan')) {
-            $q = Pengajuan::with('pegawai.unitKerja');
-            if ($user->unitKerja && $user->unitKerja->tipe === 'kelurahan') {
-                $q->where('unit_kerja_id', $user->unit_kerja_id);
-            }
-            $pengajuan = $q->latest()->paginate(15);
-            return view('pengajuan.index', compact('pengajuan'));
-        }
-
-        // Super Admin (monitoring read-only)
-        $pengajuan = Pengajuan::with('pegawai.unitKerja')->latest()->paginate(15);
         return view('pengajuan.index', compact('pengajuan'));
     }
 

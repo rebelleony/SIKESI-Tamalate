@@ -23,7 +23,8 @@
         <div class="flex items-start justify-between">
             <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Verifikasi Dokumen</p>
-                <div class="mt-2 text-3xl font-display font-black text-amber-700">{{ $antrean->count() }}</div>
+                @php $totalAntreanOperator = $antrean->count() + ($antreanKepegawaian ?? collect())->count() + ($antreanSuratMandiri ?? collect())->count(); @endphp
+                <div class="mt-2 text-3xl font-display font-black text-amber-700">{{ $totalAntreanOperator }}</div>
                 <p class="text-xs text-slate-500 mt-1">Pengajuan menunggu diteliti</p>
             </div>
             <div class="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -115,6 +116,79 @@
         </table>
     </div>
 </div>
+
+@if(($antreanKepegawaian ?? collect())->isNotEmpty())
+<div class="mt-6 rounded-2xl border border-indigo-200 bg-white shadow-card overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+            <h2 class="font-display font-extrabold text-base text-primary-950">Antrean Layanan Kepegawaian ({{ $antreanKepegawaian->count() }})</h2>
+            <p class="text-xs text-slate-500">Pengajuan Cuti, KGB, Kenaikan Pangkat, dan Pensiun menunggu verifikasi Operator</p>
+        </div>
+        <a href="{{ route('kepegawaian.index') }}" class="text-xs font-bold text-primary-700 hover:underline">Lihat Semua →</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-indigo-50/60 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-indigo-100">
+                <tr>
+                    <th class="py-3 px-6">Nomor</th>
+                    <th class="py-3 px-4">Pegawai / Unit</th>
+                    <th class="py-3 px-4">Layanan</th>
+                    <th class="py-3 px-4">Meja Saat Ini</th>
+                    <th class="py-3 px-6 text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach($antreanKepegawaian as $k)
+                <tr class="hover:bg-indigo-50/30 transition">
+                    <td class="py-3 px-6 font-mono font-semibold text-xs text-primary-700">{{ $k->nomor_pengajuan }}</td>
+                    <td class="py-3 px-4">
+                        <div class="font-semibold text-slate-800">{{ $k->pegawai->nama ?? '-' }}</div>
+                        <div class="text-xs text-slate-500">{{ $k->unitKerja->nama ?? '-' }}</div>
+                    </td>
+                    <td class="py-3 px-4 text-slate-700 font-medium">{{ $k->labelJenis() }}</td>
+                    <td class="py-3 px-4 text-xs font-semibold text-amber-800">{{ $k->meja_saat_ini }}</td>
+                    <td class="py-3 px-6 text-right">
+                        <a href="{{ route('kepegawaian.show', $k) }}" class="inline-flex items-center px-3 py-1.5 rounded-lg bg-primary-700 hover:bg-primary-800 text-white font-bold text-xs">
+                            Periksa Berkas →
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
+
+@if(($antreanSuratMandiri ?? collect())->isNotEmpty())
+<div class="mt-6 rounded-2xl border border-amber-200 bg-white shadow-card overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+            <h2 class="font-display font-extrabold text-base text-primary-950">Antrean Surat Mandiri ({{ $antreanSuratMandiri->count() }})</h2>
+            <p class="text-xs text-slate-500">Permohonan dari Portal Layanan Surat Mandiri menunggu tindak lanjut</p>
+        </div>
+        <a href="{{ route('surat-mandiri.index') }}" class="text-xs font-bold text-primary-700 hover:underline">Kelola Semua →</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <tbody class="divide-y divide-slate-100">
+                @foreach($antreanSuratMandiri as $m)
+                <tr class="hover:bg-amber-50/30 transition">
+                    <td class="py-3 px-6 font-mono font-bold text-xs text-primary-700">{{ $m->kode_tracking }}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">{{ $m->nama_pemohon }} <span class="text-xs font-normal text-slate-500">({{ $m->unit_asal }})</span></td>
+                    <td class="py-3 px-4 text-slate-700">{{ $m->jenis_surat }} — {{ $m->perihal }}</td>
+                    <td class="py-3 px-6 text-right">
+                        <a href="{{ route('surat-mandiri.index', ['q' => $m->kode_tracking]) }}" class="inline-flex items-center px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs">
+                            Proses →
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
 
 @if($presensiAntrean->isNotEmpty())
 <div class="mt-8 rounded-2xl border border-blue-200 bg-white p-6 shadow-card border-l-4 border-l-blue-600">

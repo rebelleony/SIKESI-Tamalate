@@ -21,16 +21,17 @@
         $pegawai = $p->pegawai;
     @endphp
 
-    <div class="header">
-        Makassar, {{ $p->created_at->format('d F Y') }}<br>
-        Kepada Yth. Kepala BKPSDMD Kota Makassar<br>
-        Melalui Camat Tamalate<br>
-        di - Makassar
+    <div class="kop">
+        <strong style="font-size:13px;">PEMERINTAH KOTA MAKASSAR · KECAMATAN TAMALATE</strong><br>
+        <span style="font-size: 9px;">Jalan Danau Tanjung Bunga Utara No. 181 Makassar 90224 · Telp. +62411 - 879 249</span><br>
+        <span style="font-size: 8.5px;">Email : tamalate.bekerja22@gmail.com · Nomor Registrasi: {{ $p->nomor_pengajuan }} · Klasifikasi: {{ $p->kode_klasifikasi }}</span>
     </div>
 
-    <div class="kop">
-        <strong>PEMERINTAH KOTA MAKASSAR · KECAMATAN TAMALATE</strong><br>
-        <span style="font-size: 9px;">Nomor Registrasi: {{ $p->nomor_pengajuan }} · Klasifikasi: {{ $p->kode_klasifikasi }}</span>
+    <div class="header">
+        Makassar, {{ $p->created_at->format('d F Y') }}<br>
+        Kepada Yth. Wali Kota Makassar<br>
+        Cq. Kepala Badan Kepegawaian dan Pengembangan SDM Daerah Kota Makassar<br>
+        di - Makassar
     </div>
 
     <div class="title">FORMULIR PERMINTAAN DAN PEMBERIAN CUTI</div>
@@ -43,16 +44,17 @@
         </tr>
         <tr>
             <td>Jabatan</td><td>{{ $pegawai->jabatan ?? '-' }}</td>
-            <td>Pangkat / Gol.</td><td>{{ $pegawai->pangkat_gol ?? '-' }}</td>
+            <td>Masa Kerja</td><td>{{ $pegawai->masaKerjaTeks() ?? '-' }}</td>
         </tr>
         <tr>
-            <td>Unit Kerja</td><td colspan="3">{{ $p->unitKerja->nama ?? 'Kecamatan Tamalate' }}</td>
+            <td>Unit Kerja</td><td>{{ $p->unitKerja->nama ?? 'Kecamatan Tamalate' }}</td>
+            <td>Pangkat / Gol.</td><td>{{ $pegawai->pangkat_gol ?? '-' }}</td>
         </tr>
     </table>
 
     <table>
         <tr><td colspan="4" class="sec-title">II. JENIS CUTI YANG DIAMBIL</td></tr>
-        @foreach(\App\Models\PengajuanKepegawaian::KODE_CUTI as $kode => $nama)
+        @foreach($kodeCuti as $kode => $nama)
             <tr>
                 <td width="20%">{{ $kode }}</td>
                 <td width="65%">{{ $nama }}</td>
@@ -64,70 +66,65 @@
     </table>
 
     <table>
-        <tr><td colspan="4" class="sec-title">III. ALASAN &amp; LAMANYA CUTI</td></tr>
+        <tr><td colspan="2" class="sec-title">III. ALASAN CUTI</td></tr>
+        <tr><td>{{ $d['alasan'] ?? '-' }}</td></tr>
+    </table>
+
+    <table>
+        <tr><td colspan="6" class="sec-title">IV. LAMA CUTI</td></tr>
         <tr>
-            <td width="25%">Alasan Cuti</td>
-            <td colspan="3">{{ $d['alasan'] ?? '-' }}</td>
-        </tr>
-        <tr>
-            <td>Selama</td><td>{{ $d['lama_hari'] ?? '-' }} Hari</td>
-            <td>Mulai Tanggal</td><td>{{ $d['tanggal_mulai'] ?? '-' }} s/d {{ $d['tanggal_selesai'] ?? '-' }}</td>
+            <td width="12%">Selama</td><td width="18%">{{ $d['lama_hari'] ?? '-' }} Hari</td>
+            <td width="18%">Mulai Tanggal</td><td width="22%">{{ $d['tanggal_mulai'] ?? '-' }}</td>
+            <td width="8%" style="text-align:center;">s/d</td><td width="22%">{{ $d['tanggal_selesai'] ?? '-' }}</td>
         </tr>
     </table>
 
     <table>
-        <tr><td colspan="2" class="sec-title">IV. KONTAK SELAMA MENJALANKAN CUTI</td></tr>
-        <tr>
-            <td width="25%">Telp / HP Aktif</td>
-            <td width="75%">{{ $d['no_telp'] ?? $d['no_hp'] ?? '-' }}</td>
-        </tr>
+        <tr><td colspan="5" class="sec-title">V. CATATAN CUTI</td></tr>
+        <tr><td colspan="3"><strong>1. CUTI TAHUNAN</strong></td><td colspan="2">2. CUTI BESAR</td></tr>
+        <tr><td width="15%">Tahun</td><td width="15%">Sisa</td><td width="34%">Keterangan</td><td colspan="2">3. CUTI SAKIT</td></tr>
+        <tr><td>{{ $d['tahun_cuti'] ?? $p->created_at?->format('Y') }}</td><td>{{ $d['sisa_cuti'] ?? '........' }}</td><td>{{ $d['keterangan_cuti'] ?? '' }}</td><td colspan="2">4. CUTI MELAHIRKAN</td></tr>
+        <tr><td colspan="3"></td><td colspan="2">5. CUTI KARENA ALASAN PENTING</td></tr>
+        <tr><td colspan="3"></td><td colspan="2">6. CUTI DI LUAR TANGGUNGAN NEGARA</td></tr>
     </table>
 
     <table>
-        <tr><td colspan="2" class="sec-title">V. PERTIMBANGAN &amp; KEPUTUSAN PEJABAT BERWENANG</td></tr>
+        <tr><td colspan="2" class="sec-title">VI. ALAMAT SELAMA MENJALANKAN CUTI</td></tr>
         <tr>
-            <td width="50%">Status Pemrosesan: <strong>{{ $p->labelStatus() }}</strong></td>
-            <td width="50%">Posisi Meja: <strong>{{ $p->meja_saat_ini }}</strong></td>
-        </tr>
-        @if(!empty($signatures['lurah']))
-        <tr>
-            <td colspan="2" style="background:#f0fdf4;">
-                <strong>Persetujuan Lurah (Elektronik):</strong> Disetujui oleh {{ $signatures['lurah']['nama'] }} (NIP. {{ $signatures['lurah']['nip'] }}) pada {{ $signatures['lurah']['waktu_wita'] }} · Token: <span style="font-family:monospace;font-size:9px;">{{ substr($signatures['lurah']['token'], 0, 24) }}...</span>
+            <td width="55%">Alamat: {{ $d['alamat_cuti'] ?? '-' }}<br>Telp / HP: {{ $d['no_telp'] ?? $d['no_hp'] ?? '-' }}</td>
+            <td width="45%" style="text-align:center;">
+                Hormat Saya,<br>Pemohon<br>
+                <div style="margin:8px 18px; padding:4px; border:1px dashed #64748b; font-size:8.5px;">Diajukan secara elektronik<br>{{ optional($p->created_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') }} WITA</div>
+                <u><strong>{{ $pegawai->nama ?? '-' }}</strong></u><br>NIP. {{ $pegawai->nip ?? '-' }}
             </td>
         </tr>
-        @endif
     </table>
 
-    <table class="ttd-box">
+    <table>
+        <tr><td colspan="4" class="sec-title">VII. PERTIMBANGAN ATASAN LANGSUNG</td></tr>
+        <tr><td width="25%">DISETUJUI</td><td width="25%">PERUBAHAN</td><td width="25%">DITANGGUHKAN</td><td width="25%">TIDAK DISETUJUI</td></tr>
+        <tr><td colspan="2" style="height:34px;"></td><td colspan="2" style="text-align:center;">Atasan Langsung<br><br><br><u>{{ $pegawai->atasan->nama ?? '........................................' }}</u><br>NIP. {{ $pegawai->atasan->nip ?? '........................' }}</td></tr>
+    </table>
+
+    <table>
+        <tr><td colspan="4" class="sec-title">VIII. KEPUTUSAN PEJABAT YANG BERWENANG MEMBERIKAN CUTI</td></tr>
+        <tr><td width="25%">DISETUJUI</td><td width="25%">PERUBAHAN</td><td width="25%">DITANGGUHKAN</td><td width="25%">TIDAK DISETUJUI</td></tr>
         <tr>
-            <td>
-                Mengetahui,<br>
+            <td colspan="2">Status Pemrosesan: <strong>{{ $p->labelStatus() }}</strong><br>Posisi Meja: <strong>{{ $p->meja_saat_ini }}</strong></td>
+            <td colspan="2" style="text-align:center;">
                 Camat Tamalate<br>
                 @if(!empty($signatures['camat']))
-                    <div style="border:1.5px solid #059669; background:#ecfdf5; border-radius:4px; padding:6px 8px; margin:8px 18px; font-size:9px; text-align:left; line-height:1.3;">
-                        <div style="font-weight:bold; color:#065f46; margin-bottom:2px;">&#10003; DITANDATANGANI ELEKTRONIK</div>
-                        <div style="color:#047857;">
-                            Pejabat: <strong>{{ $signatures['camat']['nama'] }}</strong><br>
-                            Waktu: {{ $signatures['camat']['waktu_wita'] }}<br>
-                            Token: <span style="font-family:monospace; font-size:8px;">{{ substr($signatures['camat']['token'], 0, 24) }}...</span>
-                        </div>
+                    <div style="border:1.5px solid #059669; background:#ecfdf5; padding:5px; margin:5px 8px; font-size:8px; text-align:left; line-height:1.3;">
+                        <strong>DITANDATANGANI ELEKTRONIK</strong><br>
+                        {{ $signatures['camat']['nama'] }} · NIP. {{ $signatures['camat']['nip'] }}<br>
+                        {{ $signatures['camat']['waktu_wita'] }}<br>
+                        Token: <span style="font-family:monospace;">{{ substr($signatures['camat']['token'], 0, 24) }}...</span>
                     </div>
-                    <u><strong>{{ $signatures['camat']['nama'] }}</strong></u><br>
-                    NIP. {{ $signatures['camat']['nip'] }}
+                    <u><strong>{{ $signatures['camat']['nama'] }}</strong></u><br>NIP. {{ $signatures['camat']['nip'] }}
                 @else
-                    <div style="margin:18px 0; color:#6b7280; font-size:9px;">(Menunggu Tanda Tangan Elektronik Camat)</div>
+                    <div style="margin:12px 0; color:#6b7280; font-size:9px;">[Menunggu Pengesahan]</div>
                     <u>( ________________________ )</u>
                 @endif
-            </td>
-            <td>
-                Hormat Saya,<br>
-                Pemohon<br>
-                <div style="margin:10px 18px; padding:5px; border:1px dashed #64748b; font-size:8.5px; color:#334155;">
-                    Diajukan secara elektronik<br>
-                    {{ optional($p->created_at)->timezone('Asia/Makassar')->format('d/m/Y H:i') }} WITA
-                </div>
-                <u><strong>{{ $pegawai->nama ?? '-' }}</strong></u><br>
-                NIP. {{ $pegawai->nip ?? '-' }}
             </td>
         </tr>
     </table>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\Pengajuan;
 use App\Models\RiwayatApproval;
+use App\Services\DigitalSignatureService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -99,15 +100,8 @@ class ApprovalController extends Controller
         DB::transaction(function () use ($pengajuan, $data, $user, $request) {
             if ($data['keputusan'] === 'setuju') {
                 // Generate token & payload Tanda Tangan Digital Terverifikasi
-                $secret = config('app.key') ?: 'sikesi-tamalate-key';
-                $signatureToken = hash_hmac('sha256', implode('|', [
-                    $pengajuan->id,
-                    $pengajuan->nomor_ajuan,
-                    $pengajuan->pegawai_id,
-                    $user->id,
-                    $user->nip,
-                    now()->timestamp,
-                ]), $secret);
+                $signedAt = now()->toImmutable();
+                $signatureToken = app(DigitalSignatureService::class)->createToken($pengajuan, $user, $signedAt);
 
                 $signaturePayload = [
                     'penandatangan' => [
@@ -127,8 +121,8 @@ class ApprovalController extends Controller
                     ],
                     'keamanan' => [
                         'token' => $signatureToken,
-                        'waktu_utc' => now()->toIso8601String(),
-                        'waktu_wita' => now()->timezone('Asia/Makassar')->format('d/m/Y H:i:s') . ' WITA',
+                        'waktu_utc' => $signedAt->toIso8601String(),
+                        'waktu_wita' => $signedAt->timezone('Asia/Makassar')->format('d/m/Y H:i:s') . ' WITA',
                         'metode' => 'Tanda Tangan Elektronik Tersertifikasi SIKESI Tamalate (BSrE Ready)',
                         'algoritma' => 'HMAC-SHA256',
                         'ip_address' => $request->ip(),
@@ -140,7 +134,7 @@ class ApprovalController extends Controller
                     'status' => 'disetujui_dan_ditandatangani',
                     'catatan' => $data['catatan'] ?? $pengajuan->catatan,
                     'tanda_tangan_pejabat_id' => $user->id,
-                    'tanda_tangan_waktu' => now(),
+                    'tanda_tangan_waktu' => $signedAt,
                     'tanda_tangan_token' => $signatureToken,
                     'tanda_tangan_payload' => $signaturePayload,
                 ]);

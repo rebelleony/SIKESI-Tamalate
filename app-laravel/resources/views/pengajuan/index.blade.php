@@ -16,8 +16,8 @@
         </p>
     </div>
 
-    @if(auth()->user()->berhakLayanan())
-        <a href="{{ route('pengajuan.create') }}" 
+    @if(auth()->user()->hasRole('pegawai') && auth()->user()->berhakLayanan())
+        <a href="{{ route('kepegawaian.create') }}" 
            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-card transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Buat Pengajuan Baru
@@ -31,6 +31,7 @@
             <thead class="bg-blue-50/60 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-blue-100">
                 <tr>
                     <th class="py-3.5 px-6">Nomor Berkas</th>
+                    <th class="py-3.5 px-4">Pemohon / Unit</th>
                     <th class="py-3.5 px-4">Jenis Layanan</th>
                     <th class="py-3.5 px-4">Status Alur SOP</th>
                     <th class="py-3.5 px-4">Tanggal Diajukan</th>
@@ -38,24 +39,29 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                @forelse($pengajuan as $p)
+                @forelse($pengajuan as $item)
                 <tr class="hover:bg-blue-50/30 transition">
                     <td class="py-4 px-6 font-mono font-semibold text-xs text-slate-800">
-                        {{ $p->nomor_ajuan ?? '-' }}
+                        {{ $item['nomor'] }}
+                        <span class="ml-1 inline-flex px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-slate-100 text-slate-600">{{ $item['sumber'] }}</span>
+                    </td>
+                    <td class="py-4 px-4">
+                        <div class="font-semibold text-slate-900 text-xs">{{ $item['pemohon'] }}</div>
+                        <div class="text-[11px] text-slate-500">{{ $item['unit'] }}</div>
                     </td>
                     <td class="py-4 px-4 font-bold text-slate-800">
-                        {{ ucfirst(str_replace('_',' ',$p->jenis_layanan)) }}
+                        {{ $item['layanan'] }}
                     </td>
                     <td class="py-4 px-4">
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                            {{ $p->labelStatus() }}
+                            {{ $item['status_label'] }}
                         </span>
                     </td>
                     <td class="py-4 px-4 text-xs text-slate-500">
-                        {{ optional($p->tanggal_ajuan)->format('d/m/Y') }}
+                        {{ $item['tanggal'] ?? '-' }}
                     </td>
                     <td class="py-4 px-6 text-right">
-                        <a href="{{ route('pengajuan.show', $p) }}" 
+                        <a href="{{ $item['url'] }}" 
                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-700 hover:bg-primary-100 font-bold text-xs border border-primary-200 transition">
                             Lihat Detail →
                         </a>
@@ -63,7 +69,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="py-12 text-center text-slate-400">
+                    <td colspan="6" class="py-12 text-center text-slate-400">
                         <div class="h-12 w-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>

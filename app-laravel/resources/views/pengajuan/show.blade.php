@@ -4,6 +4,12 @@
 <a href="{{ back()->getTargetUrl() }}" class="text-sm text-blue-600 hover:underline">← Kembali</a>
 <h1 class="text-2xl font-bold mb-1 mt-2">Detail Pengajuan</h1>
 <p class="text-sm text-gray-500 mb-4">{{ $pengajuan->nomor_ajuan }} · <span class="font-medium">{{ $pengajuan->labelStatus() }}</span></p>
+<div class="mb-4 flex flex-wrap gap-2">
+    <a href="{{ route('pengajuan.cetak', $pengajuan) }}" target="_blank" class="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-700">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+        Preview Surat Resmi
+    </a>
+</div>
 
 {{-- Banner Status Khusus & Tombol Dokumen --}}
 @if($pengajuan->status === 'selesai')

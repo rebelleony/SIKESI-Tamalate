@@ -52,6 +52,20 @@
         <div class="grid lg:grid-cols-3 gap-6">
             <!-- Form Pengajuan -->
             <div class="lg:col-span-2 bg-white border border-blue-100 rounded-2xl p-6 shadow-sm">
+                @auth
+                    @if(auth()->user()->hasRole('pimpinan', 'verifikator_pimpinan'))
+                        <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <div class="font-bold">Mode Pimpinan ({{ auth()->user()->jabatan ?? auth()->user()->nama }})</div>
+                                <p class="mt-0.5 text-amber-800">Anda dapat mengajukan surat resmi (Undangan, Surat Pengantar, atau Permohonan Fasilitasi) melalui portal ini untuk diproses penomoran &amp; pengarsipannya oleh Operator, atau langsung membuat draf dokumen siap cetak (.DOCX/.PDF).</p>
+                            </div>
+                            <a href="{{ route('template-surat.index', ['jenis' => 'undangan']) }}" class="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold shrink-0 text-center">
+                                Buat Draf Surat ↗
+                            </a>
+                        </div>
+                    @endif
+                @endauth
+
                 <div class="mb-5">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
                         Layanan Kelurahan & Unit Internal

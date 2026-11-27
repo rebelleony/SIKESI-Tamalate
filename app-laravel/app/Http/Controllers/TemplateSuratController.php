@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PengajuanKepegawaian;
 use App\Models\UnitKerja;
 use App\Support\DocxTemplateBuilder;
 use App\Support\LayananKepegawaian;
@@ -26,7 +27,9 @@ class TemplateSuratController extends Controller
             'activeJenis'    => $activeJenis,
             'units'          => $units,
             'golongan'       => LayananKepegawaian::GOLONGAN,
-            'jenisCutiList'  => SuratTemplateCatalog::JENIS_CUTI_LIST,
+            'jenisCutiList'  => auth()->user()?->isPppk()
+                ? array_values(PengajuanKepegawaian::KODE_CUTI_PPPK)
+                : SuratTemplateCatalog::JENIS_CUTI_LIST,
             'sampleFilled'   => SuratTemplateCatalog::resolveData($activeJenis, 'filled'),
             'userPrefill'    => auth()->user()?->load('unitKerja'),
         ]);
@@ -47,6 +50,14 @@ class TemplateSuratController extends Controller
         abort_unless(SuratTemplateCatalog::get($jenis) !== null, 404);
         abort_unless(in_array($format, ['pdf', 'docx'], true), 404);
 
+        if ($jenis === 'cuti' && $request->user()?->isPppk()) {
+            abort_unless(
+                in_array($request->input('jenis_cuti'), PengajuanKepegawaian::KODE_CUTI_PPPK, true),
+                422,
+                'Jenis cuti tidak tersedia untuk PPPK.'
+            );
+        }
+
         $data = SuratTemplateCatalog::resolveData($jenis, 'filled', $request->all());
 
         return $this->streamDocument($jenis, $format, $data, "CONTOH-SURAT-{$jenis}-TAMALATE.{$format}");
@@ -54,6 +65,10 @@ class TemplateSuratController extends Controller
 
     private function streamDocument(string $jenis, string $format, array $d, string $filename)
     {
+        $d['jenis_cuti_list'] = auth()->user()?->isPppk()
+            ? array_values(PengajuanKepegawaian::KODE_CUTI_PPPK)
+            : SuratTemplateCatalog::JENIS_CUTI_LIST;
+
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('template_surat.pdf', [
                 'jenis' => $jenis,
@@ -77,47 +92,128 @@ class TemplateSuratController extends Controller
         $doc = (new DocxTemplateBuilder())->addKopSurat();
 
         if ($jenis === 'cuti') {
-            $doc->addTitle('FORMULIR PERMOHONAN CUTI PEGAWAI', 'Nomor: ' . $d['nomor_surat'])
-                ->addParagraph("Makassar, {$d['tanggal_surat']}", ['align' => 'right', 'spaceAfter' => 60])
-                ->addParagraph("Kepada Yth.\nCamat Tamalate Kota Makassar\nc.q. Kasubag Umum dan Kepegawaian\ndi - Makassar", ['spaceAfter' => 120])
-                ->addParagraph('Saya yang bertanda tangan di bawah ini:', ['spaceAfter' => 60])
-                ->addKeyValueTable([
-                    ['Nama Lengkap', $d['nama_pegawai']],
-                    ['NIP / NIPPPK', $d['nip']],
-                    ['Pangkat / Gol. Ruang', $d['pangkat_gol']],
-                    ['Jabatan', $d['jabatan']],
-                    ['Satuan Organisasi', $d['unit_kerja']],
-                ], true)
-                ->addParagraph("Dengan ini mengajukan permohonan cuti untuk tahun {$d['tahun']} selama {$d['lama_hari']} hari kerja, terhitung mulai tanggal {$d['tanggal_mulai']} s.d. {$d['tanggal_selesai']}, dengan rincian jenis cuti sebagai berikut:", ['spaceAfter' => 80]);
+            $doc->addParagraph("Makassar, {$d['tanggal_surat']}", ['align' => 'right', 'spaceAfter' => 60])
+                ->addParagraph("Kepada\nYth. Wali Kota Makassar\nCq. Kepala Badan Kepegawaian dan\nPengembangan SDM Daerah Kota Makassar\nDi - Makassar", ['spaceAfter' => 100])
+                ->addTitle('FORMULIR PERMINTAAN DAN PEMBERIAN CUTI', 'Nomor: ' . $d['nomor_surat'])
+                ->addGridTable(['I. DATA PEGAWAI', '', '', ''], [
+                    ['Nama', $d['nama_pegawai'], 'NIP', $d['nip']],
+                    ['Jabatan', $d['jabatan'], 'Masa Kerja', $d['masa_kerja_teks']],
+                    ['Unit Kerja', $d['unit_kerja'], 'Pangkat / Gol.', $d['pangkat_gol']],
+                ], [1800, 3200, 1600, 2700], true);
 
             $mark = static fn (string $label) => ($d['mode'] === 'filled' && $d['jenis_cuti'] === $label) ? '[ ✓ ] ' : '[   ] ';
-            $doc->addGridTable(null, [
-                [$mark('Cuti Tahunan') . 'Cuti Tahunan', $mark('Cuti Besar') . 'Cuti Besar (Masa kerja > 5 tahun)'],
-                [$mark('Cuti Sakit') . 'Cuti Sakit (Lampiran Surat Dokter)', $mark('Cuti Alasan Penting') . 'Cuti Alasan Penting'],
-                [$mark('Cuti Melahirkan') . 'Cuti Melahirkan', $mark('Cuti di Luar Tanggungan Negara (CLTN)') . 'Cuti di Luar Tanggungan Negara (CLTN)'],
-            ], [4650, 4650], true);
+            $cutiRows = [];
+            foreach (array_chunk($d['jenis_cuti_list'], 2) as $rowIndex => $labels) {
+                $row = [];
+                foreach ($labels as $columnIndex => $label) {
+                    $nomor = $rowIndex * 2 + $columnIndex + 1;
+                    $row[] = $mark($label) . $nomor . '. ' . $label;
+                }
+                if (count($row) === 1) {
+                    $row[] = '';
+                }
+                $cutiRows[] = $row;
+            }
+
+            $doc->addGridTable(['II. JENIS CUTI YANG DIAMBIL', ''], $cutiRows, [4650, 4650], true);
 
             $doc->addKeyValueTable([
-                ['Alasan Pengajuan Cuti', $d['alasan']],
-                ['Nomor Telepon / HP', $d['no_hp']],
+                ['III. Alasan Cuti', $d['alasan']],
+                ['IV. Lama Cuti', "Selama {$d['lama_hari']} · Mulai Tanggal {$d['tanggal_mulai']} s/d {$d['tanggal_selesai']}"],
+                ['V. Catatan Cuti', "1. Cuti Tahunan · Tahun: {$d['tahun_cuti']} · Sisa: {$d['sisa_cuti']} Hari · Keterangan: {$d['keterangan_cuti']}\n2. Cuti Besar\n3. Cuti Sakit\n4. Cuti Melahirkan\n5. Cuti Karena Alasan Penting\n6. Cuti Di Luar Tanggungan Negara"],
+                ['VI. Alamat Selama Menjalankan Cuti', "Alamat: {$d['alamat_cuti']}\nTelp / HP: {$d['no_hp']}"],
             ], true)
-                ->addParagraph('Demikian permohonan ini saya buat untuk dapat dipertimbangkan sebagaimana mestinya.', ['spaceAfter' => 140])
                 ->addSignatureColumns(
                     [
-                        'Catatan Kasubag Kepegawaian:',
-                        "Sisa Hak Cuti: [ {$d['sisa_cuti']} ] Hari",
-                        'Paraf Verifikasi: ..................',
+                        'VII. PERTIMBANGAN ATASAN LANGSUNG:',
+                        '[   ] DISETUJUI   [   ] PERUBAHAN',
+                        '[   ] DITANGGUHKAN   [   ] TIDAK DISETUJUI',
+                        "\n{$d['atasan_jabatan']}",
+                        "\n{$d['atasan_nama']}",
+                        "NIP. {$d['atasan_nip']}",
                     ],
                     [
-                        'Hormat saya,',
-                        "Pemohon Cuti,\n\n",
-                        "({$d['nama_pegawai']})",
+                        'Hormat Saya,',
+                        "\n\n({$d['nama_pegawai']})",
                         "NIP. {$d['nip']}",
+                        "\nVIII. KEPUTUSAN PEJABAT YANG BERWENANG MEMBERIKAN CUTI:",
+                        '[   ] DISETUJUI   [   ] PERUBAHAN',
+                        '[   ] DITANGGUHKAN   [   ] TIDAK DISETUJUI',
+                        'Camat Tamalate,',
+                        "\n{$d['nama_camat']}",
+                        "NIP. {$d['nip_camat']}",
                     ],
                     true
                 );
 
             return $doc;
+        }
+
+        if ($jenis === 'pengantar') {
+            return $doc->addParagraph("Makassar, {$d['tanggal_surat']}", ['align' => 'right', 'spaceAfter' => 60])
+                ->addParagraph("Yth. {$d['tujuan_surat']}\nDi - Makassar", ['spaceAfter' => 100])
+                ->addTitle('SURAT PENGANTAR', 'Nomor : ' . $d['nomor_surat'])
+                ->addGridTable(
+                    ['NO', 'JENIS DOKUMEN YANG DIKIRIM', 'BANYAKNYA', 'KETERANGAN'],
+                    [['1', $d['dokumen_dikirim'], $d['banyaknya'], $d['ket_pengantar']]],
+                    [700, 4400, 1800, 2400],
+                    true
+                )
+                ->addSignatureColumns([], [
+                    $d['jabatan_ttd'],
+                    "\n\n{$d['nama_camat']}",
+                    $d['pangkat_camat'],
+                    "NIP. {$d['nip_camat']}",
+                ], false);
+        }
+
+        if ($jenis === 'fasilitasi') {
+            return $doc->addParagraph("Makassar, {$d['tanggal_surat']}", ['align' => 'right', 'spaceAfter' => 60])
+                ->addKeyValueTable([
+                    ['Nomor', $d['nomor_surat']],
+                    ['Sifat', $d['sifat_surat']],
+                    ['Lampiran', '-'],
+                    ['Hal', $d['hal_surat']],
+                ], false)
+                ->addParagraph("Yth. {$d['tujuan_surat']}\ndi\nMakassar", ['spaceAfter' => 100])
+                ->addParagraph("Dengan hormat,\nDalam rangka pelaksanaan {$d['kegiatan_rangka']}, kami memohon kesediaan Bapak/Ibu untuk memfasilitasi penggunaan {$d['tempat_kegiatan']} untuk pelaksanaan kegiatan yang akan diselenggarakan pada:", ['spaceAfter' => 80])
+                ->addKeyValueTable([
+                    ['Hari, tanggal', $d['hari_tanggal']],
+                    ['Waktu', $d['waktu_kegiatan']],
+                    ['Jumlah Peserta', $d['jumlah_peserta']],
+                ], false)
+                ->addParagraph("Sehubungan dengan hal tersebut, kami memohon kesediaan Bapak/Ibu untuk memberikan izin penggunaan tempat guna mendukung kelancaran pelaksanaan kegiatan dimaksud.\nDemikian permohonan ini kami sampaikan. Atas perhatian dan kerja sama Bapak/Ibu, kami ucapkan terima kasih.", ['spaceAfter' => 140])
+                ->addSignatureColumns([], [
+                    $d['jabatan_ttd'],
+                    "\n\n{$d['nama_camat']}",
+                    $d['pangkat_camat'],
+                    "NIP. {$d['nip_camat']}",
+                ], false);
+        }
+
+        if ($jenis === 'undangan') {
+            return $doc->addParagraph("Makassar, {$d['tanggal_surat']}", ['align' => 'right', 'spaceAfter' => 60])
+                ->addKeyValueTable([
+                    ['Nomor', $d['nomor_surat']],
+                    ['Sifat', $d['sifat_surat']],
+                    ['Lampiran', '-'],
+                    ['Hal', $d['hal_surat']],
+                ], false)
+                ->addParagraph("Yth. {$d['tujuan_surat']}\ndi\nMakassar", ['spaceAfter' => 100])
+                ->addParagraph("{$d['kegiatan_rangka']}, dengan ini kami mengundang Bapak/Ibu/Saudara(i) untuk menghadiri acara yang akan dilaksanakan pada:", ['spaceAfter' => 80])
+                ->addKeyValueTable([
+                    ['Hari, tanggal', $d['hari_tanggal']],
+                    ['Waktu', $d['waktu_kegiatan']],
+                    ['Tempat', $d['tempat_kegiatan']],
+                    ['Acara', $d['acara_kegiatan']],
+                ], false)
+                ->addParagraph("Sehubungan dengan hal tersebut, {$d['pesan_penutup']}\nDemikian disampaikan, atas perhatian dan kehadiran Bapak/Ibu diucapkan terima kasih.", ['spaceAfter' => 140])
+                ->addSignatureColumns([], [
+                    $d['jabatan_ttd'],
+                    "\n\n{$d['nama_camat']}",
+                    $d['pangkat_camat'],
+                    "NIP. {$d['nip_camat']}",
+                ], false);
         }
 
         if ($jenis === 'kgb') {

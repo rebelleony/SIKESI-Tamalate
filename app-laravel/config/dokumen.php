@@ -16,10 +16,11 @@ return [
 
     'instansi_induk' => env('DOKUMEN_INSTANSI_INDUK', 'PEMERINTAH KOTA MAKASSAR'),
     'instansi'       => env('DOKUMEN_INSTANSI', 'KECAMATAN TAMALATE'),
-    'alamat'         => env('DOKUMEN_ALAMAT', 'Kota Makassar, Sulawesi Selatan'),
-    'telepon'        => env('DOKUMEN_TELEPON'),
-    'email'          => env('DOKUMEN_EMAIL'),
-    'kode_pos'       => env('DOKUMEN_KODE_POS'),
+    'alamat'         => env('DOKUMEN_ALAMAT', 'Jl. Danau Tanjung Bunga No. 181, Kel. Maccini Sombala, Kec. Tamalate, Kota Makassar 90224'),
+    'telepon'        => env('DOKUMEN_TELEPON', '+62411 - 879 249'),
+    'email'          => env('DOKUMEN_EMAIL', 'tamalate.bekerja22@gmail.com'),
+    'kode_pos'       => env('DOKUMEN_KODE_POS', '90224'),
+    'homepage'       => env('DOKUMEN_HOMEPAGE', 'http://www.kectamalate.com'),
     'logo'           => env('DOKUMEN_LOGO'),
 
     // Kota tempat dokumen ditandatangani (untuk baris tanggal "... , 9 Oktober 2026").

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengajuan;
+use App\Services\DigitalSignatureService;
 use App\Support\DokumenKepegawaian;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -38,6 +39,52 @@ class DokumenController extends Controller
         return $request->boolean('unduh')
             ? $pdf->download($nama)
             : $pdf->stream($nama);
+    }
+
+    public function cetak(Request $request, Pengajuan $pengajuan, DigitalSignatureService $signatures)
+    {
+        $this->authorize($request, $pengajuan);
+
+        return view('surat.cetak', $this->dataCetak($pengajuan, $signatures, false));
+    }
+
+    public function cetakPdf(Request $request, Pengajuan $pengajuan, DigitalSignatureService $signatures)
+    {
+        $this->authorize($request, $pengajuan);
+        $data = $this->dataCetak($pengajuan, $signatures, true);
+        $filename = 'SURAT-' . preg_replace('/[^A-Za-z0-9._-]+/', '_', (string) ($pengajuan->nomor_agenda ?: $pengajuan->nomor_ajuan)) . '.pdf';
+
+        return Pdf::loadView('surat.cetak', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOption('defaultFont', 'DejaVu Sans')
+            ->stream($filename);
+    }
+
+    private function dataCetak(Pengajuan $pengajuan, DigitalSignatureService $signatures, bool $pdf): array
+    {
+        $pengajuan->loadMissing(['pegawai.unitKerja', 'tandaTanganPejabat', 'riwayat.pejabat']);
+        $signed = $signatures->isSigned($pengajuan);
+        $verified = $signed && $signatures->isValid($pengajuan);
+        $logos = [];
+
+        foreach (['logo-makassar.png', 'logo-kecamatan.png'] as $name) {
+            $path = public_path('images/' . $name);
+            $logos[$name] = ! is_file($path)
+                ? null
+                : ($pdf
+                    ? 'data:image/png;base64,' . base64_encode(file_get_contents($path))
+                    : asset('images/' . $name));
+        }
+
+        return [
+            'doc' => DokumenKepegawaian::untuk($pengajuan),
+            'pengajuan' => $pengajuan,
+            'logoKiri' => $logos['logo-makassar.png'],
+            'logoKanan' => $logos['logo-kecamatan.png'],
+            'qrCode' => $verified ? $signatures->qrCodeDataUri($pengajuan) : null,
+            'signatureValid' => $verified,
+            'signaturePresent' => $signed,
+        ];
     }
 
     /**

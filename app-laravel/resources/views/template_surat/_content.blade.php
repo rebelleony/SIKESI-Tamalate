@@ -198,7 +198,7 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">Alasan Pengajuan Cuti</label>
                     <textarea name="alasan" id="inp_alasan" rows="2" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">{{ $sampleFilled['alasan'] }}</textarea>
                 </div>
-                <div class="grid sm:grid-cols-2 gap-3">
+                <div class="grid sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">No. HP / WA</label>
                         <input type="text" name="no_hp" id="inp_no_hp" value="{{ $userPrefill->no_hp ?? $sampleFilled['no_hp'] }}"
@@ -208,6 +208,103 @@
                         <label class="block text-xs font-bold text-slate-700 mb-1">Sisa Hak Cuti (Catatan Kasubag)</label>
                         <input type="text" name="sisa_cuti" id="inp_sisa_cuti" value="12"
                                oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Keterangan Cuti Tahunan</label>
+                        <input type="text" name="keterangan_cuti" id="inp_keterangan_cuti" value="{{ $sampleFilled['keterangan_cuti'] }}"
+                               oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Selama Menjalankan Cuti</label>
+                    <textarea name="alamat_cuti" id="inp_alamat_cuti" rows="2" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">{{ old('alamat_cuti', $userPrefill->alamat ?? $sampleFilled['alamat_cuti']) }}</textarea>
+                </div>
+            </div>
+
+            {{-- Field Khusus: SURAT PENGANTAR --}}
+            <div data-form-section="pengantar" class="hidden space-y-3 pt-3 border-t border-slate-100">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Yth. Tujuan Surat</label>
+                    <input type="text" name="tujuan_surat" id="inp_tujuan_pengantar" value="Kepala Bidang Mutasi BKPSDMD Kota Makassar" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Dokumen yang Dikirim</label>
+                    <textarea name="dokumen_dikirim" id="inp_dokumen_dikirim" rows="3" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">Berkas Permohonan Untuk Mendapatkan Tunjangan Anak a/n : Ardiansyah Zuqur (NIP. 19910403 202421 1 007) Penggerak Swadaya Masyarakat Ahli Pertama</textarea>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Banyaknya</label>
+                        <input type="text" name="banyaknya" id="inp_banyaknya" value="1 (Satu) Berkas" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Keterangan</label>
+                        <input type="text" name="ket_pengantar" id="inp_ket_pengantar" value="Dikirim dengan hormat untuk bahan seperlunya" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                </div>
+            </div>
+
+            {{-- Field Khusus: PERMOHONAN FASILITASI --}}
+            <div data-form-section="fasilitasi" class="hidden space-y-3 pt-3 border-t border-slate-100">
+                <div class="grid sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Yth. Tujuan Surat</label>
+                        <input type="text" name="tujuan_surat" id="inp_tujuan_fasilitasi" value="Direktur Politeknik Pariwisata Makassar" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Hal Surat</label>
+                        <input type="text" name="hal_surat" id="inp_hal_fasilitasi" value="Permohonan Fasilitasi Aula" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Rangka Kegiatan</label>
+                    <input type="text" name="kegiatan_rangka" id="inp_kegiatan_fasilitasi" value="Sosialisasi Pekan Panutan Pajak Bumi dan Bangunan (PBB) Tingkat Kecamatan Tamalate" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div class="grid sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Hari, Tanggal</label>
+                        <input type="text" name="hari_tanggal" id="inp_hari_fasilitasi" value="Rabu, 17 Juni 2026" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Waktu</label>
+                        <input type="text" name="waktu_kegiatan" id="inp_waktu_fasilitasi" value="08.00 Wita - Selesai" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Tempat / Fasilitas</label>
+                        <input type="text" name="tempat_kegiatan" id="inp_tempat_fasilitasi" value="aula di Politeknik Pariwisata Makassar" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Peserta</label>
+                        <input type="text" name="jumlah_peserta" id="inp_peserta_fasilitasi" value="100 orang" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                </div>
+            </div>
+
+            {{-- Field Khusus: UNDANGAN --}}
+            <div data-form-section="undangan" class="hidden space-y-3 pt-3 border-t border-slate-100">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Yth. Pihak Diundang</label>
+                    <input type="text" name="tujuan_surat" id="inp_tujuan_undangan" value="Lurah Se Kecamatan Tamalate" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Dasar / Pengantar Undangan</label>
+                    <textarea name="kegiatan_rangka" id="inp_kegiatan_undangan" rows="2" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">Menindaklanjuti Hasil Bimbingan Teknis Penerapan Perwali tentang Pakaian Dinas ASN dan Tata Naskah Dinas Pemerintah Kota Makassar serta untuk meningkatkan tertib administrasi</textarea>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Hari, Tanggal</label>
+                        <input type="text" name="hari_tanggal" id="inp_hari_undangan" value="Senin, 08 Juni 2026" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Waktu</label>
+                        <input type="text" name="waktu_kegiatan" id="inp_waktu_undangan" value="09.00 Wita" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Tempat</label>
+                        <input type="text" name="tempat_kegiatan" id="inp_tempat_undangan" value="Aula Kantor Kecamatan Tamalate Lt. 3" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Acara</label>
+                        <input type="text" name="acara_kegiatan" id="inp_acara_undangan" value="Penerapan Perwali Pakaian Dinas ASN dan Tata Naskah Dinas" oninput="renderPreview()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs">
                     </div>
                 </div>
             </div>
@@ -444,7 +541,8 @@ function renderPreview() {
         <div class="text-center border-b-4 border-double border-slate-900 pb-2 mb-4">
             <div class="text-sm font-bold tracking-wide">PEMERINTAH KOTA MAKASSAR</div>
             <div class="text-base font-extrabold">KECAMATAN TAMALATE</div>
-            <div class="text-[10px] text-slate-600">Jalan Danau Tanjung Bunga No. 1, Makassar 90224 · Pos-el: kecamatantamalate@makassarkota.go.id</div>
+            <div class="text-[10px] text-slate-600">Jalan Danau Tanjung Bunga Utara No. 181 Makassar 90224 · Telp. +62411 - 879 249</div>
+            <div class="text-[10px] text-slate-600">Email : tamalate.bekerja22@gmail.com · Home page : http://www.kectamalate.com</div>
         </div>
     `;
 
@@ -452,60 +550,196 @@ function renderPreview() {
 
     if (currentJenis === 'cuti') {
         const jenisCuti = usePlaceholders ? '' : (document.getElementById('inp_jenis_cuti')?.value || 'Cuti Tahunan');
-        const lama = v('inp_lama_hari', '[Jumlah_Hari]');
-        const mulai = usePlaceholders ? '[Tanggal_Mulai]' : formatTanggalId(document.getElementById('inp_tanggal_mulai')?.value);
-        const selesai = usePlaceholders ? '[Tanggal_Selesai]' : formatTanggalId(document.getElementById('inp_tanggal_selesai')?.value);
-        const alasan = v('inp_alasan', '[Jelaskan alasan cuti secara singkat dan jelas]');
+        const lama = v('inp_lama_hari', '[Lama Cuti]');
+        const mulai = usePlaceholders ? '[Tanggal Mulai]' : formatTanggalId(document.getElementById('inp_tanggal_mulai')?.value);
+        const selesai = usePlaceholders ? '[Tanggal Selesai]' : formatTanggalId(document.getElementById('inp_tanggal_selesai')?.value);
+        const alasan = v('inp_alasan', '[Alasan Pengajuan Cuti]');
         const hp = v('inp_no_hp', '[Nomor Telepon Aktif]');
         const sisa = v('inp_sisa_cuti', '.....');
+        const keteranganCuti = v('inp_keterangan_cuti', '');
+        const alamatCuti = v('inp_alamat_cuti', '[Alamat Selama Menjalankan Cuti]');
+        const jenisCutiOptions = @json($jenisCutiList);
         const chk = (label) => (!usePlaceholders && jenisCuti === label) ? '<strong class="text-emerald-700">[ ✓ ]</strong>' : '[ &nbsp; ]';
+        const jenisCutiRows = [];
+        for (let index = 0; index < jenisCutiOptions.length; index += 2) {
+            const leftLabel = jenisCutiOptions[index];
+            const rightLabel = jenisCutiOptions[index + 1];
+            const leftCell = `${chk(leftLabel)} ${index + 1}. ${escHtml(leftLabel)}`;
+            const rightCell = rightLabel ? `${chk(rightLabel)} ${index + 2}. ${escHtml(rightLabel)}` : '';
+            jenisCutiRows.push(`<tr><td class="border border-slate-800 px-2 py-1 w-1/2">${leftCell}</td><td class="border border-slate-800 px-2 py-1 w-1/2">${rightCell}</td></tr>`);
+        }
 
         bodyHtml = `
-            <div class="text-center font-bold underline text-[13px]">FORMULIR PERMINTAAN CUTI PEGAWAI</div>
+            <div class="ml-auto w-1/2 mb-3 text-[11px]">
+                Makassar, ${escHtml(tglSurat)}<br><br>
+                Kepada<br>
+                Yth. Wali Kota Makassar<br>
+                Cq. Kepala Badan Kepegawaian dan<br>
+                Pengembangan SDM Daerah Kota Makassar<br>
+                Di - Makassar
+            </div>
+            <div class="text-center font-bold underline text-[13px]">FORMULIR PERMINTAAN DAN PEMBERIAN CUTI</div>
             <div class="text-center font-bold text-[11px] mb-3">Nomor: ${escHtml(nomorSurat)}</div>
-            <div class="text-right mb-2">Makassar, ${escHtml(tglSurat)}</div>
-            <div class="mb-3">Kepada Yth.<br><strong>Camat Tamalate Kota Makassar</strong><br>c.q. Kasubag Umum dan Kepegawaian<br>di - Makassar</div>
-            <p class="mb-2">Saya yang bertanda tangan di bawah ini:</p>
             <table class="w-full border border-slate-800 border-collapse mb-3">
-                <tr><td class="border border-slate-800 px-2 py-1 w-1/3">Nama Lengkap</td><td class="border border-slate-800 px-2 py-1">${escHtml(nama)}</td></tr>
-                <tr><td class="border border-slate-800 px-2 py-1">NIP / NIPPPK</td><td class="border border-slate-800 px-2 py-1">${escHtml(nip)}</td></tr>
-                <tr><td class="border border-slate-800 px-2 py-1">Pangkat / Gol. Ruang</td><td class="border border-slate-800 px-2 py-1">${escHtml(gol)}</td></tr>
-                <tr><td class="border border-slate-800 px-2 py-1">Jabatan</td><td class="border border-slate-800 px-2 py-1">${escHtml(jabatan)}</td></tr>
-                <tr><td class="border border-slate-800 px-2 py-1">Satuan Organisasi</td><td class="border border-slate-800 px-2 py-1">${escHtml(unit)}</td></tr>
-            </table>
-            <p class="mb-2">Dengan ini mengajukan permohonan cuti untuk tahun ${escHtml(tahun)} selama <strong>${escHtml(lama)}</strong> hari kerja, terhitung mulai tanggal <strong>${escHtml(mulai)}</strong> s.d. <strong>${escHtml(selesai)}</strong>:</p>
-            <table class="w-full border border-slate-800 border-collapse mb-3">
+                <tr class="bg-slate-100"><th colspan="4" class="border border-slate-800 px-2 py-1 text-left">I. DATA PEGAWAI</th></tr>
                 <tr>
-                    <td class="border border-slate-800 px-2 py-1 w-1/2">${chk('Cuti Tahunan')} Cuti Tahunan</td>
-                    <td class="border border-slate-800 px-2 py-1 w-1/2">${chk('Cuti Besar')} Cuti Besar (Masa kerja &gt; 5 th)</td>
+                    <td class="border border-slate-800 px-2 py-1 w-1/6">Nama</td><td class="border border-slate-800 px-2 py-1 w-1/3">${escHtml(nama)}</td>
+                    <td class="border border-slate-800 px-2 py-1 w-1/6">NIP</td><td class="border border-slate-800 px-2 py-1 w-1/3">${escHtml(nip)}</td>
                 </tr>
                 <tr>
-                    <td class="border border-slate-800 px-2 py-1">${chk('Cuti Sakit')} Cuti Sakit (Surat Dokter)</td>
-                    <td class="border border-slate-800 px-2 py-1">${chk('Cuti Alasan Penting')} Cuti Alasan Penting</td>
+                    <td class="border border-slate-800 px-2 py-1">Jabatan</td><td class="border border-slate-800 px-2 py-1">${escHtml(jabatan)}</td>
+                    <td class="border border-slate-800 px-2 py-1">Pangkat/Gol</td><td class="border border-slate-800 px-2 py-1">${escHtml(gol)}</td>
                 </tr>
                 <tr>
-                    <td class="border border-slate-800 px-2 py-1">${chk('Cuti Melahirkan')} Cuti Melahirkan</td>
-                    <td class="border border-slate-800 px-2 py-1">${chk('Cuti di Luar Tanggungan Negara (CLTN)')} CLTN</td>
+                    <td class="border border-slate-800 px-2 py-1">Unit Kerja</td><td colspan="3" class="border border-slate-800 px-2 py-1">${escHtml(unit)}</td>
                 </tr>
             </table>
             <table class="w-full border border-slate-800 border-collapse mb-3">
-                <tr><td class="border border-slate-800 px-2 py-1 w-1/3">Alasan Pengajuan Cuti</td><td class="border border-slate-800 px-2 py-1">${escHtml(alasan)}</td></tr>
-                <tr><td class="border border-slate-800 px-2 py-1">Nomor Telepon / HP</td><td class="border border-slate-800 px-2 py-1">${escHtml(hp)}</td></tr>
+                <tr class="bg-slate-100"><th colspan="2" class="border border-slate-800 px-2 py-1 text-left">II. JENIS CUTI YANG DIAMBIL</th></tr>
+                ${jenisCutiRows.join('')}
             </table>
-            <table class="w-full border border-slate-800 border-collapse mt-4">
+            <table class="w-full border border-slate-800 border-collapse mb-3">
+                <tr class="bg-slate-100"><th class="border border-slate-800 px-2 py-1 text-left">III. ALASAN CUTI</th></tr>
+                <tr><td class="border border-slate-800 px-2 py-1">${escHtml(alasan)}</td></tr>
+            </table>
+            <table class="w-full border border-slate-800 border-collapse mb-3">
+                <tr class="bg-slate-100"><th colspan="6" class="border border-slate-800 px-2 py-1 text-left">IV. LAMA CUTI</th></tr>
+                <tr><td class="border border-slate-800 px-2 py-1">Selama</td><td class="border border-slate-800 px-2 py-1">${escHtml(lama)}</td><td class="border border-slate-800 px-2 py-1">Mulai Tanggal</td><td class="border border-slate-800 px-2 py-1">${escHtml(mulai)}</td><td class="border border-slate-800 px-2 py-1">s/d</td><td class="border border-slate-800 px-2 py-1">${escHtml(selesai)}</td></tr>
+            </table>
+            <table class="w-full border border-slate-800 border-collapse mb-3">
+                <tr class="bg-slate-100"><th colspan="5" class="border border-slate-800 px-2 py-1 text-left">V. CATATAN CUTI</th></tr>
+                <tr><td colspan="3" class="border border-slate-800 px-2 py-1"><strong>1. CUTI TAHUNAN</strong></td><td class="border border-slate-800 px-2 py-1">2. CUTI BESAR</td><td class="border border-slate-800 px-2 py-1"></td></tr>
+                <tr><td class="border border-slate-800 px-2 py-1">Tahun</td><td class="border border-slate-800 px-2 py-1">Sisa</td><td class="border border-slate-800 px-2 py-1">Keterangan</td><td colspan="2" class="border border-slate-800 px-2 py-1">3. CUTI SAKIT</td></tr>
+                <tr><td class="border border-slate-800 px-2 py-1">${escHtml(tahun)}</td><td class="border border-slate-800 px-2 py-1">${escHtml(sisa)} Hari</td><td class="border border-slate-800 px-2 py-1">${escHtml(keteranganCuti)}</td><td colspan="2" class="border border-slate-800 px-2 py-1">4. CUTI MELAHIRKAN</td></tr>
+                <tr><td colspan="3" class="border border-slate-800 px-2 py-1"></td><td colspan="2" class="border border-slate-800 px-2 py-1">5. CUTI KARENA ALASAN PENTING</td></tr>
+                <tr><td colspan="3" class="border border-slate-800 px-2 py-1"></td><td colspan="2" class="border border-slate-800 px-2 py-1">6. CUTI DI LUAR TANGGUNGAN NEGARA</td></tr>
+            </table>
+            <table class="w-full border border-slate-800 border-collapse mb-3">
+                <tr class="bg-slate-100"><th colspan="2" class="border border-slate-800 px-2 py-1 text-left">VI. ALAMAT SELAMA MENJALANKAN CUTI</th></tr>
+                <tr><td class="border border-slate-800 px-2 py-1">Alamat</td><td class="border border-slate-800 px-2 py-1">${escHtml(alamatCuti)}</td></tr>
+                <tr><td class="border border-slate-800 px-2 py-1">Telp / HP</td><td class="border border-slate-800 px-2 py-1">${escHtml(hp)}</td></tr>
+            </table>
+            <table class="w-full border border-slate-800 border-collapse mt-3">
                 <tr>
                     <td class="border border-slate-800 p-2 w-1/2 align-top">
-                        <strong>Catatan Kasubag Kepegawaian:</strong><br><br>
-                        Sisa Hak Cuti: [ ${escHtml(sisa)} ] Hari<br>
-                        Paraf Verifikasi: ..................
+                        <strong>VII. PERTIMBANGAN ATASAN LANGSUNG</strong><br>
+                        <span class="text-[10px]">[ ] DISETUJUI · [ ] PERUBAHAN · [ ] DITANGGUHKAN · [ ] TIDAK DISETUJUI</span><br><br>
+                        {{ e($sampleFilled['atasan_jabatan']) }}<br><br><br>
+                        <u>{{ e($sampleFilled['atasan_nama']) }}</u><br>NIP. {{ e($sampleFilled['atasan_nip']) }}
                     </td>
                     <td class="border border-slate-800 p-2 w-1/2 text-center">
-                        Hormat saya,<br>Pemohon Cuti,<br><br><br>
-                        <u><strong>(${escHtml(nama)})</strong></u><br>
-                        NIP. ${escHtml(nip)}
+                        <strong>VIII. KEPUTUSAN PEJABAT YANG BERWENANG MEMBERIKAN CUTI</strong><br>
+                        [ ] DISETUJUI · [ ] PERUBAHAN · [ ] DITANGGUHKAN · [ ] TIDAK DISETUJUI<br>
+                        Camat Tamalate,<br><br><br>
+                        <u><strong>${usePlaceholders ? '[Nama Camat Tamalate]' : 'Muh Aril Syahbani K., S.IP'}</strong></u><br>
+                        NIP. ${usePlaceholders ? '[NIP Camat]' : '19880415 200701 1 001'}
                     </td>
                 </tr>
             </table>
+        `;
+    } else if (currentJenis === 'pengantar') {
+        const tujuan = v('inp_tujuan_pengantar', '[Jabatan / Instansi Tujuan]');
+        const dok = v('inp_dokumen_dikirim', '[Jenis Dokumen yang Dikirim]');
+        const banyak = v('inp_banyaknya', '1 (Satu) Berkas');
+        const ket = v('inp_ket_pengantar', 'Dikirim dengan hormat untuk bahan seperlunya');
+
+        bodyHtml = `
+            <div class="text-right mb-2">Makassar, ${escHtml(tglSurat)}</div>
+            <div class="mb-3">Yth. <strong>${escHtml(tujuan)}</strong><br>Di - Makassar</div>
+            <div class="text-center font-bold underline text-[13px]">SURAT PENGANTAR</div>
+            <div class="text-center font-bold text-[11px] mb-3">Nomor : ${escHtml(nomorSurat)}</div>
+            <table class="w-full border border-slate-800 border-collapse mb-4">
+                <thead class="bg-slate-100">
+                    <tr>
+                        <th class="border border-slate-800 px-2 py-1">NO</th>
+                        <th class="border border-slate-800 px-2 py-1">JENIS DOKUMEN YANG DIKIRIM</th>
+                        <th class="border border-slate-800 px-2 py-1">BANYAKNYA</th>
+                        <th class="border border-slate-800 px-2 py-1">KETERANGAN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border border-slate-800 px-2 py-1 text-center">1</td>
+                        <td class="border border-slate-800 px-2 py-1">${escHtml(dok)}</td>
+                        <td class="border border-slate-800 px-2 py-1 text-center">${escHtml(banyak)}</td>
+                        <td class="border border-slate-800 px-2 py-1">${escHtml(ket)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="ml-auto w-1/2 text-center">
+                Camat,<br><br><br>
+                <u><strong>${usePlaceholders ? '[Nama Camat Tamalate]' : 'Muh Aril Syahbani K., S.IP'}</strong></u><br>
+                Pembina, IV/a<br>
+                NIP: ${usePlaceholders ? '[NIP Camat]' : '19880415 200701 1 001'}
+            </div>
+        `;
+    } else if (currentJenis === 'fasilitasi') {
+        const tujuan = v('inp_tujuan_fasilitasi', '[Tujuan Surat]');
+        const hal = v('inp_hal_fasilitasi', 'Permohonan Fasilitasi Aula');
+        const rangka = v('inp_kegiatan_fasilitasi', '[Maksud / Rangka Kegiatan]');
+        const hari = v('inp_hari_fasilitasi', '[Hari, Tanggal]');
+        const waktu = v('inp_waktu_fasilitasi', '[Waktu]');
+        const tempat = v('inp_tempat_fasilitasi', '[Tempat]');
+        const peserta = v('inp_peserta_fasilitasi', '[Jumlah Peserta]');
+
+        bodyHtml = `
+            <div class="text-right mb-2">Makassar, ${escHtml(tglSurat)}</div>
+            <div class="grid grid-cols-12 gap-2 mb-3">
+                <div class="col-span-7 space-y-0.5">
+                    <div>Nomor : ${escHtml(nomorSurat)}</div>
+                    <div>Sifat : Penting</div>
+                    <div>Lampiran : -</div>
+                    <div>Hal : <strong>${escHtml(hal)}</strong></div>
+                </div>
+                <div class="col-span-5">Yth. <strong>${escHtml(tujuan)}</strong><br>di Makassar</div>
+            </div>
+            <p class="mb-2">Dengan hormat,<br>Dalam rangka pelaksanaan ${escHtml(rangka)}, kami memohon kesediaan Bapak/Ibu untuk memfasilitasi penggunaan ${escHtml(tempat)} pada:</p>
+            <div class="pl-4 mb-3 space-y-0.5">
+                <div>Hari, tanggal : ${escHtml(hari)}</div>
+                <div>Waktu : ${escHtml(waktu)}</div>
+                <div>Jumlah Peserta : ${escHtml(peserta)}</div>
+            </div>
+            <p class="mb-4">Demikian permohonan ini kami sampaikan. Atas perhatian dan kerja sama Bapak/Ibu, kami ucapkan terima kasih.</p>
+            <div class="ml-auto w-1/2 text-center">
+                a.n Camat<br>Sekretaris Camat,<br><br><br>
+                <u><strong>${usePlaceholders ? '[Nama Sekretaris Camat]' : 'Saddam Musma, S.STP,M.Si'}</strong></u><br>
+                Penata Tk I, III/d<br>
+                NIP. ${usePlaceholders ? '[NIP Sekcam]' : '19910705 201507 1 002'}
+            </div>
+        `;
+    } else if (currentJenis === 'undangan') {
+        const tujuan = v('inp_tujuan_undangan', '[Pihak Diundang]');
+        const rangka = v('inp_kegiatan_undangan', '[Dasar Undangan]');
+        const hari = v('inp_hari_undangan', '[Hari, Tanggal]');
+        const waktu = v('inp_waktu_undangan', '[Waktu]');
+        const tempat = v('inp_tempat_undangan', '[Tempat]');
+        const acara = v('inp_acara_undangan', '[Acara]');
+
+        bodyHtml = `
+            <div class="text-right mb-2">Makassar, ${escHtml(tglSurat)}</div>
+            <div class="grid grid-cols-12 gap-2 mb-3">
+                <div class="col-span-7 space-y-0.5">
+                    <div>Nomor : ${escHtml(nomorSurat)}</div>
+                    <div>Sifat : Penting</div>
+                    <div>Lampiran : -</div>
+                    <div>Hal : <strong>Undangan</strong></div>
+                </div>
+                <div class="col-span-5">Yth. <strong>${escHtml(tujuan)}</strong><br>di Makassar</div>
+            </div>
+            <p class="mb-2">${escHtml(rangka)}, dengan ini kami mengundang Bapak/Ibu/Saudara(i) untuk menghadiri acara yang akan dilaksanakan pada:</p>
+            <div class="pl-4 mb-3 space-y-0.5">
+                <div>Hari, tanggal : ${escHtml(hari)}</div>
+                <div>Waktu : ${escHtml(waktu)}</div>
+                <div>Tempat : ${escHtml(tempat)}</div>
+                <div>Acara : ${escHtml(acara)}</div>
+            </div>
+            <p class="mb-4">Demikian disampaikan, atas perhatian dan kehadiran Bapak/Ibu diucapkan terima kasih.</p>
+            <div class="ml-auto w-1/2 text-center">
+                Camat,<br><br><br>
+                <u><strong>${usePlaceholders ? '[Nama Camat Tamalate]' : 'Muh Aril Syahbani K., S.IP'}</strong></u><br>
+                Pembina, IV/a<br>
+                NIP. ${usePlaceholders ? '[NIP Camat]' : '19880415 200701 1 001'}
+            </div>
         `;
     } else if (currentJenis === 'kgb') {
         const gLama = v('inp_gaji_lama', '[Gaji Lama]');

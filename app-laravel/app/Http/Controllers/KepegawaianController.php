@@ -42,6 +42,9 @@ class KepegawaianController extends Controller
 
         if ($user->hasRole('pegawai')) {
             $query->where('pegawai_id', $user->id);
+            if ($user->isPppkParuhWaktu()) {
+                $query->where('jenis_layanan', 'cuti');
+            }
         } elseif ($user->hasRole('pimpinan') && $user->unitKerja?->tipe === 'kelurahan') {
             $query->where('unit_kerja_id', $user->unit_kerja_id);
         }
@@ -50,7 +53,9 @@ class KepegawaianController extends Controller
 
         return view('kepegawaian.index', [
             'pengajuan' => $pengajuan,
-            'jenisList' => PengajuanKepegawaian::JENIS_LAYANAN,
+            'jenisList' => $user->isPppkParuhWaktu()
+                ? ['cuti' => PengajuanKepegawaian::JENIS_LAYANAN['cuti']]
+                : PengajuanKepegawaian::JENIS_LAYANAN,
             'statusList' => PengajuanKepegawaian::STATUS_LABELS,
             'jenis' => $jenis,
             'status' => $status,
@@ -63,12 +68,12 @@ class KepegawaianController extends Controller
         $user = $request->user();
         abort_if($user->hasRole('super_admin'), 403, 'Super Admin tidak bertindak sebagai pemohon layanan.');
         abort_unless($user->hasRole('pegawai'), 403, 'Hanya Pegawai/Staf yang dapat mengajukan layanan.');
-        abort_unless($user->berhakLayanan(), 403, 'PPPK Paruh Waktu tidak memiliki akses ke layanan Cuti, KGB, Kenaikan Pangkat, dan Pensiun.');
+        abort_unless($user->berhakCuti(), 403, 'Akun ini tidak memiliki akses ke layanan cuti.');
 
         return view('kepegawaian.create', [
             'pegawai'    => $user->load('unitKerja'),
             'jenisList'  => PengajuanKepegawaian::JENIS_LAYANAN,
-            'kodeCuti'   => PengajuanKepegawaian::KODE_CUTI,
+            'kodeCuti'   => $user->isPppk() ? PengajuanKepegawaian::KODE_CUTI_PPPK : PengajuanKepegawaian::KODE_CUTI,
             'golongan'   => LayananKepegawaian::GOLONGAN,
             'jenisPensiun' => LayananKepegawaian::JENIS_PENSIUN,
             'nextKgb'    => LayananKepegawaian::nextKgbDate($user),
@@ -82,7 +87,8 @@ class KepegawaianController extends Controller
         $user = $request->user();
         abort_if($user->hasRole('super_admin'), 403, 'Super Admin tidak bertindak sebagai pemohon layanan.');
         abort_unless($user->hasRole('pegawai'), 403, 'Hanya Pegawai/Staf yang dapat mengajukan layanan.');
-        abort_unless($user->berhakLayanan(), 403, 'PPPK Paruh Waktu tidak berhak mengajukan layanan kepegawaian.');
+        abort_unless($user->berhakCuti(), 403, 'Akun ini tidak berhak mengajukan layanan cuti.');
+        abort_unless(! $user->isPppkParuhWaktu() || $request->input('jenis_layanan') === 'cuti', 403, 'PPPK Paruh Waktu hanya dapat mengajukan cuti.');
 
         $base = $request->validate([
             'jenis_layanan'  => ['required', 'in:cuti,kgb,kenaikan_pangkat,pensiun'],
@@ -164,6 +170,7 @@ class KepegawaianController extends Controller
         $boleh = $kepegawaian->pegawai_id === $user->id
             || $user->hasRole('operator', 'verifikator_pimpinan', 'pimpinan', 'super_admin');
         abort_unless($boleh, 403, 'Anda tidak berhak mengakses pengajuan ini.');
+        abort_unless(! $user->isPppkParuhWaktu() || $kepegawaian->jenis_layanan === 'cuti', 403);
 
         $kepegawaian->load(['pegawai.unitKerja', 'unitKerja', 'lampiran', 'logs.aktor']);
 
@@ -262,6 +269,7 @@ class KepegawaianController extends Controller
     {
         $user = $request->user();
         abort_unless($kepegawaian->pegawai_id === $user->id, 403);
+        abort_unless(! $user->isPppkParuhWaktu() || $kepegawaian->jenis_layanan === 'cuti', 403);
         abort_unless($kepegawaian->status === 'perlu_revisi', 400, 'Pengajuan tidak dalam status perlu revisi.');
 
         $request->validate([
@@ -320,6 +328,7 @@ class KepegawaianController extends Controller
         $boleh = $p->pegawai_id === $user->id
             || $user->hasRole('operator', 'verifikator_pimpinan', 'pimpinan', 'super_admin');
         abort_unless($boleh, 403);
+        abort_unless(! $user->isPppkParuhWaktu() || $p->jenis_layanan === 'cuti', 403);
 
         return Storage::disk('local')->download($lampiran->path, $lampiran->nama_file_asli);
     }
@@ -340,6 +349,9 @@ class KepegawaianController extends Controller
         $pdf = Pdf::loadView('kepegawaian.pdf_form_cuti', [
             'p'          => $kepegawaian,
             'signatures' => $this->buildDigitalSignatures($kepegawaian),
+            'kodeCuti'   => $kepegawaian->pegawai->isPppk()
+                ? PengajuanKepegawaian::KODE_CUTI_PPPK
+                : PengajuanKepegawaian::KODE_CUTI,
         ])
             ->setPaper('a4')
             ->setOption('defaultFont', 'DejaVu Sans');
@@ -460,20 +472,28 @@ class KepegawaianController extends Controller
     private function validateAndBuildPayload(Request $request, string $jenis): array
     {
         if ($jenis === 'cuti') {
+            $jenisCutiOptions = $request->user()->isPppk()
+                ? PengajuanKepegawaian::KODE_CUTI_PPPK
+                : PengajuanKepegawaian::KODE_CUTI;
             $d = $request->validate([
-                'kode_cuti'       => ['required', 'in:' . implode(',', array_keys(PengajuanKepegawaian::KODE_CUTI))],
+                'kode_cuti'       => ['required', 'in:' . implode(',', array_keys($jenisCutiOptions))],
                 'tanggal_mulai'   => ['required', 'date'],
                 'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
                 'alasan'          => ['required', 'string', 'max:500'],
+                'alamat_cuti'     => ['required', 'string', 'max:255'],
                 'no_telp'         => ['required', 'string', 'max:25'],
             ]);
             $lamaHari = Carbon::parse($d['tanggal_mulai'])->diffInDays(Carbon::parse($d['tanggal_selesai'])) + 1;
             $payload = $d + [
-                'jenis_cuti_nama' => PengajuanKepegawaian::KODE_CUTI[$d['kode_cuti']],
+                'jenis_cuti_nama' => $jenisCutiOptions[$d['kode_cuti']],
                 'lama_hari'       => $lamaHari,
             ];
 
-            return [$payload, $d['kode_cuti'], null];
+            $kodeKlasifikasi = $d['kode_cuti'] === 'cuti_bersama'
+                ? '800'
+                : $d['kode_cuti'];
+
+            return [$payload, $kodeKlasifikasi, null];
         }
 
         if ($jenis === 'kgb') {

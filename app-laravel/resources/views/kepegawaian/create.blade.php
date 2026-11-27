@@ -15,24 +15,33 @@
     @csrf
 
     <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">Pilih Jenis Layanan <span class="text-rose-600">*</span></label>
-        <select name="jenis_layanan" id="jenis_layanan" required class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:border-primary-500 focus:outline-none">
-            @foreach($jenisList as $k => $lbl)
-                <option value="{{ $k }}" @selected(old('jenis_layanan', 'cuti') === $k)>{{ $lbl }}</option>
-            @endforeach
-        </select>
+        @if($pegawai->isPppkParuhWaktu())
+            <input type="hidden" name="jenis_layanan" id="jenis_layanan" value="cuti">
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Jenis Layanan</label>
+            <div class="rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2.5 text-sm font-semibold text-blue-900">Pengajuan Cuti PPPK Paruh Waktu</div>
+        @else
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Pilih Jenis Layanan <span class="text-rose-600">*</span></label>
+            <select name="jenis_layanan" id="jenis_layanan" required class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold focus:border-primary-500 focus:outline-none">
+                @foreach($jenisList as $k => $lbl)
+                    <option value="{{ $k }}" @selected(old('jenis_layanan', 'cuti') === $k)>{{ $lbl }}</option>
+                @endforeach
+            </select>
+        @endif
     </div>
 
     <!-- Section: CUTI -->
     <div data-section="cuti" class="space-y-4 border-t border-slate-100 pt-4">
-        <h2 class="font-bold text-sm text-primary-900 uppercase tracking-wider">Detail Pengajuan Cuti (800.1.11.2 s/d .7)</h2>
+        <h2 class="font-bold text-sm text-primary-900 uppercase tracking-wider">{{ $pegawai->isPppk() ? 'Jenis Cuti PPPK' : 'Detail Pengajuan Cuti (800.1.11.2 s/d .7)' }}</h2>
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">Jenis Cuti & Kode Klasifikasi</label>
             <select name="kode_cuti" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
                 @foreach($kodeCuti as $kode => $nama)
-                    <option value="{{ $kode }}" @selected(old('kode_cuti') === $kode)>{{ $kode }} — {{ $nama }}</option>
+                    <option value="{{ $kode }}" @selected(old('kode_cuti') === $kode)>{{ $kode === 'cuti_bersama' ? '800' : $kode }} — {{ $nama }}</option>
                 @endforeach
             </select>
+            @if($pegawai->isPppk())
+                <p class="mt-1 text-xs text-slate-500">Jenis cuti mengikuti Peraturan BKN Nomor 7 Tahun 2022.</p>
+            @endif
         </div>
         <div class="grid sm:grid-cols-2 gap-4">
             <div>
@@ -51,6 +60,10 @@
         <div>
             <label class="block text-sm font-semibold text-slate-700 mb-1">No. Telp / HP</label>
             <input name="no_telp" value="{{ old('no_telp', $pegawai->no_hp) }}" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">
+        </div>
+        <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Alamat Selama Menjalankan Cuti</label>
+            <textarea name="alamat_cuti" rows="2" required class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm">{{ old('alamat_cuti', $pegawai->alamat) }}</textarea>
         </div>
     </div>
 

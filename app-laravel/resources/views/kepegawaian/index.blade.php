@@ -9,10 +9,10 @@
             SOP Layanan Kepegawaian · Kecamatan & 11 Kelurahan
         </div>
         <h1 class="text-2xl sm:text-3xl font-display font-extrabold text-primary-950">
-            Layanan Kepegawaian (Cuti, KGB, Pangkat & Pensiun)
+            {{ $u->isPppkParuhWaktu() ? 'Pengajuan Cuti PPPK Paruh Waktu' : 'Layanan Kepegawaian (Cuti, KGB, Pangkat & Pensiun)' }}
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-            Pantau posisi berkas secara real-time dari meja Operator Kelurahan/Kecamatan hingga Camat & BKPSDMD.
+            {{ $u->isPppkParuhWaktu() ? 'Ajukan dan pantau pengajuan cuti Anda hingga keputusan pejabat berwenang.' : 'Pantau posisi berkas secara real-time dari meja Operator Kelurahan/Kecamatan hingga Camat & BKPSDMD.' }}
         </p>
     </div>
 
@@ -28,10 +28,10 @@
             </a>
         @endif
 
-        @if($u->hasRole('pegawai') && $u->berhakLayanan())
+        @if($u->hasRole('pegawai') && $u->berhakCuti())
             <a href="{{ route('kepegawaian.create') }}"
                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-card transition">
-                + Ajukan Layanan Baru
+            + {{ $u->isPppkParuhWaktu() ? 'Ajukan Cuti' : 'Ajukan Layanan Baru' }}
             </a>
         @endif
     </div>

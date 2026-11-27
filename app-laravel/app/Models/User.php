@@ -84,6 +84,22 @@ class User extends Authenticatable
         return $this->jenis_pegawai !== 'PPPK_PARUH_WAKTU';
     }
 
+    public function isPppk(): bool
+    {
+        return in_array($this->jenis_pegawai, ['PPPK_PENUH', 'PPPK_PENUH_WAKTU', 'PPPK_PARUH_WAKTU'], true);
+    }
+
+    public function isPppkParuhWaktu(): bool
+    {
+        return $this->jenis_pegawai === 'PPPK_PARUH_WAKTU';
+    }
+
+    public function berhakCuti(): bool
+    {
+        return $this->jenis_pegawai === null
+            || in_array($this->jenis_pegawai, ['PNS', 'PPPK_PENUH', 'PPPK_PENUH_WAKTU', 'PPPK_PARUH_WAKTU'], true);
+    }
+
     public function masaKerjaTeks(): string
     {
         $tahun = (int) $this->masa_kerja_tahun;

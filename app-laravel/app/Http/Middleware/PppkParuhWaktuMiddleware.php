@@ -8,16 +8,14 @@ use Illuminate\Http\Request;
 /**
  * PppkParuhWaktuMiddleware — SIP-TAMALATE
  *
- * Memblokir pegawai berstatus PPPK_PARUH_WAKTU dari mengakses
- * menu/route yang khusus untuk PNS dan PPPK Penuh Waktu:
- *   - Pengajuan Cuti
+ * Membatasi pegawai PPPK_PARUH_WAKTU pada alur pengajuan cuti:
  *   - Pengajuan KGB (Kenaikan Gaji Berkala)
  *   - Pengajuan Kenaikan Pangkat
  *   - Pengajuan Pensiun
  *
  * PPPK Paruh Waktu HANYA boleh mengakses:
  *   ✅ Presensi Apel
- *   ✅ Dashboard (tracking status)
+ *   ✅ Pengajuan cuti dan tracking pengajuan
  *   ✅ Profil
  */
 class PppkParuhWaktuMiddleware
@@ -26,8 +24,22 @@ class PppkParuhWaktuMiddleware
     {
         $user = $request->user();
 
-        if ($user && $user->jenis_pegawai === 'PPPK_PARUH_WAKTU') {
-            abort(403, 'Pegawai PPPK Paruh Waktu tidak memiliki akses ke menu Cuti, KGB, Kenaikan Pangkat, dan Pensiun. Anda hanya dapat mengakses Presensi Apel dan Tracking pengajuan.');
+        if ($user && $user->isPppkParuhWaktu()) {
+            $allowedRoutes = [
+                'kepegawaian.index',
+                'kepegawaian.create',
+                'kepegawaian.store',
+                'kepegawaian.show',
+                'kepegawaian.form-cuti',
+                'kepegawaian.lampiran.unduh',
+                'kepegawaian.revisi',
+            ];
+
+            abort_unless(
+                in_array($request->route()?->getName(), $allowedRoutes, true),
+                403,
+                'PPPK Paruh Waktu hanya dapat mengakses pengajuan cuti.'
+            );
         }
 
         return $next($request);

@@ -82,7 +82,7 @@
             <div>
                 <label class="block text-gray-600 mb-1">Jenis Pegawai <span class="text-red-500">*</span></label>
                 <select name="jenis_pegawai" required class="w-full border rounded px-3 py-2">
-                    @foreach(['PNS' => 'PNS', 'PPPK_PENUH_WAKTU_WAKTU' => 'PPPK Penuh Waktu', 'PPPK_PARUH_WAKTU' => 'PPPK Paruh Waktu'] as $k => $lbl)
+                    @foreach(['PNS' => 'PNS', 'PPPK_PENUH' => 'PPPK Penuh Waktu', 'PPPK_PARUH_WAKTU' => 'PPPK Paruh Waktu'] as $k => $lbl)
                         <option value="{{ $k }}" @selected($v('jenis_pegawai', 'PNS') === $k)>{{ $lbl }}</option>
                     @endforeach
                 </select>

@@ -81,6 +81,12 @@
             z-index: 0;
             border-radius: 9999px;
         }
+        .primary-nav > a,
+        .primary-nav > .group > a {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            font-size: 0.75rem;
+        }
         @keyframes pulseSlow {
             0%, 100% { opacity: 0.4; transform: scale(1); }
             50% { opacity: 0.65; transform: scale(1.05); }
@@ -99,8 +105,8 @@
     <!-- STICKY TOP HEADER & TAB BAR -->
     <header class="sticky top-0 z-40 border-b border-blue-100 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-200">
         <!-- Main Top Bar -->
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 gap-4">
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+            <div class="flex min-h-16 flex-nowrap items-center justify-between gap-2 py-2">
                 
                 <!-- Left: Branding with Emblem -->
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 group shrink-0">
@@ -116,7 +122,7 @@
                     </div>
                     <div class="leading-tight">
                         <div class="flex items-center gap-2">
-                            <span class="font-display text-base sm:text-lg font-extrabold text-primary-900 tracking-tight group-hover:text-primary-700 transition">
+                            <span class="font-display text-sm font-extrabold text-primary-900 tracking-tight transition group-hover:text-primary-700 sm:text-base">
                                 Kecamatan Tamalate
                             </span>
                             <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 uppercase tracking-wider">
@@ -130,7 +136,7 @@
                 </a>
 
                 <!-- Center & Right: Navigation Tabs (Desktop) -->
-                <nav class="hidden lg:flex items-center gap-1 xl:gap-1.5" aria-label="Navigasi Utama">
+                <nav class="primary-nav hidden min-w-0 flex-1 flex-nowrap items-center justify-center gap-3 whitespace-nowrap xl:flex" aria-label="Navigasi Utama">
                     @php
                         $isDashboard = request()->routeIs('dashboard');
                         $isPengajuan = request()->routeIs('pengajuan.*');
@@ -162,7 +168,7 @@
                             </a>
                             <div class="absolute left-0 top-full mt-1 w-48 bg-white border border-blue-100 rounded-xl shadow-lift py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
                                 <a href="{{ route('pengajuan.index') }}" class="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-primary-700">Daftar Pengajuan Saya</a>
-                                <a href="{{ route('pengajuan.create') }}" class="block px-4 py-2 text-xs font-semibold text-primary-700 bg-blue-50/50 hover:bg-blue-100">
+                                <a href="{{ route('kepegawaian.create') }}" class="block px-4 py-2 text-xs font-semibold text-primary-700 bg-blue-50/50 hover:bg-blue-100">
                                     Buat Pengajuan Baru
                                 </a>
                             </div>
@@ -170,7 +176,7 @@
                     @endif
 
                     <!-- Layanan Kepegawaian (Cuti, KGB, Pangkat, Pensiun) -->
-                    @if(!auth()->user()->hasRole('pegawai') || auth()->user()->berhakLayanan())
+                    @if(!auth()->user()->hasRole('pegawai') || auth()->user()->berhakCuti())
                         <a href="{{ route('kepegawaian.index') }}"
                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 {{ $isKepegawaian ? 'bg-primary-50 text-primary-700 font-bold border border-blue-200/80' : 'text-slate-600 hover:text-primary-700 hover:bg-slate-100/80' }}">
                             <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -247,41 +253,40 @@
                     @endif
                 </nav>
 
-                <!-- Right Utilities: Role Badge + User Profile & Logout -->
-                <div class="hidden sm:flex items-center gap-3">
-                    <!-- Role Pill -->
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-200/80 shadow-xs">
-                        <span class="h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span>
-                        {{ auth()->user()->role->nama_role ?? 'Pengguna' }}
-                    </span>
-
-                    <!-- Profile Pill -->
-                    <a href="{{ route('profil.show') }}" 
-                       class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-primary-300 hover:bg-primary-50/50 transition-all text-xs font-semibold text-slate-700 {{ $isProfil ? 'ring-2 ring-primary-500 bg-primary-50 text-primary-800' : '' }}">
-                        <div class="h-7 w-7 rounded-full bg-primary-700 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
-                            {{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}
-                        </div>
-                        <div class="text-left hidden md:block">
-                            <span class="block truncate max-w-[110px]">{{ auth()->user()->nama }}</span>
-                        </div>
-                    </a>
-
-                    <!-- Logout Button -->
-                    <form method="POST" action="{{ route('logout') }}" class="m-0">
-                        @csrf
-                        <button type="submit" 
-                                title="Keluar dari akun"
-                                class="inline-flex items-center justify-center h-9 px-3 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 text-xs font-semibold transition">
-                            <svg class="w-4 h-4 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                            <span class="hidden sm:inline">Keluar</span>
+                <!-- Account Menu -->
+                <div class="hidden shrink-0 items-center gap-2 xl:flex">
+                    <div class="relative group">
+                        <button type="button" aria-haspopup="true" aria-label="Menu akun {{ auth()->user()->nama }}"
+                                class="inline-flex min-h-11 max-w-64 items-center gap-2.5 rounded-xl border border-slate-200 px-2.5 py-1.5 text-left text-slate-700 transition hover:border-primary-300 hover:bg-primary-50/50 focus:outline-none focus:ring-2 focus:ring-primary-500 {{ $isProfil ? 'ring-2 ring-primary-500 bg-primary-50 text-primary-800' : '' }}">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-700 text-xs font-bold uppercase text-white shadow-xs">
+                                {{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}
+                            </span>
+                            <span class="hidden min-w-0 flex-col gap-0.5 md:flex">
+                                <span class="max-w-40 truncate text-xs font-semibold leading-tight">{{ auth()->user()->nama }}</span>
+                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold leading-tight text-amber-700">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                    {{ auth()->user()->role->nama_role ?? 'Pengguna' }}
+                                </span>
+                            </span>
+                            <svg class="h-3.5 w-3.5 shrink-0 text-slate-400 transition group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
                         </button>
-                    </form>
+                        <div class="invisible absolute right-0 top-full z-50 mt-2 w-52 rounded-xl border border-blue-100 bg-white py-1.5 opacity-0 shadow-lift transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                            <a href="{{ route('profil.show') }}" class="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-primary-700">Profil Saya</a>
+                            <form method="POST" action="{{ route('logout') }}" class="m-0 border-t border-slate-100 pt-1.5">
+                                @csrf
+                                <button type="submit" class="flex w-full items-center gap-2 px-4 py-2 text-left text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0-4-4m4 4H7m6 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1"/></svg>
+                                    Keluar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Mobile Hamburger Toggle -->
                 <button type="button" 
                         onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" 
-                        class="lg:hidden inline-flex items-center justify-center p-2 rounded-lg text-slate-600 hover:text-primary-700 hover:bg-blue-50 focus:outline-none"
+                        class="ml-auto inline-flex shrink-0 items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-blue-50 hover:text-primary-700 focus:outline-none xl:hidden"
                         aria-label="Menu Utama">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
@@ -289,7 +294,7 @@
         </div>
 
         <!-- Mobile Navigation Drawer -->
-        <div id="mobileMenu" class="hidden lg:hidden border-t border-blue-100 bg-white/95 backdrop-blur px-4 pt-3 pb-5 space-y-1">
+        <div id="mobileMenu" class="hidden border-t border-blue-100 bg-white/95 px-4 pb-5 pt-3 backdrop-blur xl:hidden space-y-1">
             <div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
                     <div class="h-8 w-8 rounded-full bg-primary-700 text-white flex items-center justify-center font-bold text-xs uppercase">
@@ -309,7 +314,10 @@
             <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isDashboard ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Dashboard</a>
             @if(auth()->user()->hasRole('pegawai') && auth()->user()->berhakLayanan())
                 <a href="{{ route('pengajuan.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isPengajuan ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Pengajuan Saya</a>
-                <a href="{{ route('pengajuan.create') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-primary-700 hover:bg-blue-50">+ Buat Pengajuan Baru</a>
+                <a href="{{ route('kepegawaian.create') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-primary-700 hover:bg-blue-50">+ Buat Pengajuan Baru</a>
+            @elseif(auth()->user()->hasRole('pegawai') && auth()->user()->isPppkParuhWaktu())
+                <a href="{{ route('kepegawaian.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isKepegawaian ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Pengajuan Cuti</a>
+                <a href="{{ route('kepegawaian.create') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-primary-700 hover:bg-blue-50">+ Ajukan Cuti</a>
             @endif
             <a href="{{ route('presensi.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ $isPresensi ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Presensi Apel</a>
             <a href="{{ route('template-surat.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold {{ request()->routeIs('template-surat.*') ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50' }}">Template Surat</a>

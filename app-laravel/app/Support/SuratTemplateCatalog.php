@@ -6,18 +6,18 @@ use App\Models\SuratKeluar;
 use Illuminate\Support\Carbon;
 
 /**
- * Katalog Master Template Surat Kepegawaian & Tata Naskah Dinas Kecamatan Tamalate.
- * Sumber data terpusat untuk Pratinjau Web, Ekspor PDF, dan Ekspor DOCX.
+ * Katalog Master Template Surat Kepegawaian & Persuratan Resmi Kecamatan Tamalate.
+ * Diselaraskan dengan dokumen resmi Tata Naskah Dinas Kecamatan Tamalate (Permendagri 83/2022 & Perwali Makassar).
  */
 class SuratTemplateCatalog
 {
     public const JENIS_CUTI_LIST = [
         'Cuti Tahunan',
+        'Cuti Besar',
         'Cuti Sakit',
         'Cuti Melahirkan',
-        'Cuti Besar',
-        'Cuti Alasan Penting',
-        'Cuti di Luar Tanggungan Negara (CLTN)',
+        'Cuti Karena Alasan Penting',
+        'Cuti Di Luar Tanggungan Negara',
     ];
 
     public static function all(): array
@@ -25,17 +25,54 @@ class SuratTemplateCatalog
         return [
             'cuti' => [
                 'key'              => 'cuti',
-                'judul'            => 'Formulir Permohonan Cuti Pegawai',
-                'singkat'          => 'Permohonan Cuti',
+                'judul'            => 'Formulir Permintaan dan Pemberian Cuti',
+                'singkat'          => 'Formulir Cuti',
                 'kode_klasifikasi' => '800.1.3',
                 'tag_nomor'        => '{AUTO_NUMBER_CUTI}',
                 'nomor_template'   => '800.1.3 / {AUTO_NUMBER_CUTI} / KT / {BULAN_ROMAWI} / {TAHUN}',
-                'deskripsi'        => 'Format baku permohonan Cuti Tahunan, Sakit, Melahirkan, Besar, Alasan Penting, dan CLTN lengkap dengan kolom catatan sisa cuti Kasubag Kepegawaian.',
+                'deskripsi'        => 'Format resmi Permintaan & Pemberian Cuti kepada Wali Kota Makassar Cq. Kepala BKPSDMD Kota Makassar lengkap dengan Catatan Cuti, Pertimbangan Atasan Langsung, dan Keputusan Camat.',
                 'persyaratan'      => [
-                    'Formulir Permohonan Cuti Pegawai (ditandatangani pemohon)',
+                    'Formulir Permintaan & Pemberian Cuti',
                     'Cuti Sakit: Surat Keterangan Dokter',
-                    'Cuti Melahirkan: Surat Perkiraan Lahir / HPL',
+                    'Cuti Melahirkan: Surat Keterangan / Perkiraan Lahir',
                     'Cuti Besar: Bukti masa kerja > 5 tahun',
+                ],
+            ],
+            'pengantar' => [
+                'key'              => 'pengantar',
+                'judul'            => 'Surat Pengantar',
+                'singkat'          => 'Surat Pengantar',
+                'kode_klasifikasi' => '800.1.11.4',
+                'tag_nomor'        => '{AUTO_NUMBER_PENGANTAR}',
+                'nomor_template'   => '800.1.11.4 / {AUTO_NUMBER_PENGANTAR} / KT / {BULAN_ROMAWI} / {TAHUN}',
+                'deskripsi'        => 'Surat Pengantar pengiriman berkas kepegawaian (mis. Tunjangan Anak / Usulan BKPSDMD) dengan tabel Jenis Dokumen, Banyaknya, dan Keterangan.',
+                'persyaratan'      => [
+                    'Daftar berkas yang dikirimkan',
+                    'Dokumen pendukung sesuai tujuan surat pengantar',
+                ],
+            ],
+            'fasilitasi' => [
+                'key'              => 'fasilitasi',
+                'judul'            => 'Permohonan Fasilitasi Aula / Kegiatan',
+                'singkat'          => 'Permohonan Fasilitasi',
+                'kode_klasifikasi' => '800',
+                'tag_nomor'        => '{AUTO_NUMBER_FASILITASI}',
+                'nomor_template'   => '800 / {AUTO_NUMBER_FASILITASI} / KT / {BULAN_ROMAWI} / {TAHUN}',
+                'deskripsi'        => 'Surat permohonan izin/fasilitasi tempat kegiatan kepada instansi mitra, ditandatangani Camat atau a.n. Camat Sekretaris Camat.',
+                'persyaratan'      => [
+                    'Rincian hari, tanggal, waktu, tempat, dan jumlah peserta kegiatan',
+                ],
+            ],
+            'undangan' => [
+                'key'              => 'undangan',
+                'judul'            => 'Surat Undangan Resmi',
+                'singkat'          => 'Undangan',
+                'kode_klasifikasi' => '800',
+                'tag_nomor'        => '{AUTO_NUMBER_UNDANGAN}',
+                'nomor_template'   => '800 / {AUTO_NUMBER_UNDANGAN} / KT / {BULAN_ROMAWI} / {TAHUN}',
+                'deskripsi'        => 'Surat Undangan rapat/sosialisasi/pembinaan kepada Lurah se-Kecamatan Tamalate atau perangkat terkait.',
+                'persyaratan'      => [
+                    'Rincian hari, tanggal, waktu, tempat, dan acara kegiatan',
                 ],
             ],
             'kgb' => [
@@ -59,7 +96,7 @@ class SuratTemplateCatalog
                 'kode_klasifikasi' => '000.1.2',
                 'tag_nomor'        => '{AUTO_NUMBER_ST}',
                 'nomor_template'   => '000.1.2 / {AUTO_NUMBER_ST} / KT / {BULAN_ROMAWI} / {TAHUN}',
-                'deskripsi'        => 'Format Surat Perintah Tugas resmi berdasarkan Perwali Makassar No. 16 Tahun 2017 tentang Tata Naskah Dinas.',
+                'deskripsi'        => 'Format Surat Perintah Tugas resmi berdasarkan Perwali Makassar tentang Tata Naskah Dinas.',
                 'persyaratan'      => [
                     'Surat undangan / dasar penugasan kedinasan',
                     'Daftar nama pegawai yang ditugaskan',
@@ -108,7 +145,7 @@ class SuratTemplateCatalog
     {
         $meta = self::get($jenis) ?? self::get('cuti');
         $now = Carbon::now('Asia/Makassar');
-        $romawi = SuratKeluar::BULAN_ROMAWI[(int) $now->month] ?? 'XI';
+        $romawi = SuratKeluar::BULAN_ROMAWI[(int) $now->month] ?? 'VI';
         $tahun = (string) $now->year;
 
         if ($mode === 'blank') {
@@ -116,21 +153,43 @@ class SuratTemplateCatalog
                 'mode'              => 'blank',
                 'meta'              => $meta,
                 'nomor_surat'       => $meta['nomor_template'],
-                'tanggal_surat'     => '[Tanggal_Pengajuan]',
+                'tanggal_surat'     => '[Tanggal_Surat]',
                 'tahun'             => '{TAHUN}',
                 'nama_pegawai'      => '[Nama Pegawai]',
                 'nip'               => '[NIP / NIPPPK Pegawai]',
                 'pangkat_gol'       => '[Pangkat, Gol/Ruang]',
                 'jabatan'           => '[Jabatan Pegawai]',
-                'unit_kerja'        => 'Kecamatan Tamalate / Kelurahan [Nama Kelurahan]',
+                'unit_kerja'        => 'Kecamatan Tamalate',
+                'masa_kerja_teks'   => '[... Tahun ... Bulan]',
                 // Cuti
                 'jenis_cuti'        => '',
-                'lama_hari'         => '[Jumlah_Hari]',
-                'tanggal_mulai'     => '[Tanggal_Mulai]',
-                'tanggal_selesai'   => '[Tanggal_Selesai]',
-                'alasan'            => '[Jelaskan alasan cuti secara singkat dan jelas]',
+                'lama_hari'         => '[Lama Cuti]',
+                'tanggal_mulai'     => '[Tanggal Mulai]',
+                'tanggal_selesai'   => '[Tanggal Selesai]',
+                'alasan'            => '[Alasan Pengajuan Cuti]',
                 'no_hp'             => '[Nomor Telepon Aktif]',
+                'alamat_cuti'       => '[Alamat Selama Menjalankan Cuti]',
+                'tahun_cuti'        => '{TAHUN}',
                 'sisa_cuti'         => '.....',
+                'keterangan_cuti'   => '[Keterangan Cuti Tahunan]',
+                'atasan_jabatan'    => '[Jabatan Atasan Langsung]',
+                'atasan_nama'       => '[Nama Atasan Langsung]',
+                'atasan_nip'        => '[NIP Atasan Langsung]',
+                // Surat Pengantar
+                'tujuan_surat'      => '[Jabatan / Instansi Tujuan]',
+                'dokumen_dikirim'   => '[Jenis Dokumen yang Dikirim a/n Pegawai]',
+                'banyaknya'         => '1 (Satu) Berkas',
+                'ket_pengantar'     => 'Dikirim dengan hormat untuk bahan seperlunya',
+                // Fasilitasi & Undangan
+                'sifat_surat'       => 'Penting',
+                'hal_surat'         => '[Hal Surat]',
+                'kegiatan_rangka'   => '[Maksud / Rangka Kegiatan]',
+                'hari_tanggal'      => '[Hari, Tanggal Pelaksanaan]',
+                'waktu_kegiatan'    => '[08.00 Wita - Selesai]',
+                'tempat_kegiatan'   => '[Lokasi / Tempat Kegiatan]',
+                'jumlah_peserta'    => '[Jumlah Peserta]',
+                'acara_kegiatan'    => '[Nama Acara / Agenda]',
+                'pesan_penutup'     => '[Catatan tambahan / utusan peserta]',
                 // KGB
                 'gaji_lama'         => '[Gaji Lama]',
                 'tmt_kgb_lama'      => '[TMT KGB Lama]',
@@ -155,9 +214,10 @@ class SuratTemplateCatalog
                 'tmt_usulan'        => '[TMT Diusulkan]',
                 'jenis_pensiun'     => '[BUP / APS]',
                 // Penandatangan
-                'nama_camat'        => '[NAMA CAMAT TAMALATE]',
-                'pangkat_camat'     => '[Pangkat Camat]',
-                'nip_camat'         => '[NIP Camat]',
+                'jabatan_ttd'       => $jenis === 'fasilitasi' ? "a.n Camat\nSekretaris Camat," : 'Camat,',
+                'nama_camat'        => $jenis === 'fasilitasi' ? '[Nama Sekretaris Camat]' : '[Nama Camat Tamalate]',
+                'pangkat_camat'     => '[Pangkat, Gol/Ruang]',
+                'nip_camat'         => '[NIP Pejabat]',
             ];
         }
 
@@ -170,22 +230,46 @@ class SuratTemplateCatalog
         return [
             'mode'              => 'filled',
             'meta'              => $meta,
-            'nomor_surat'       => "{$meta['kode_klasifikasi']} / 0001 / KT / {$romawi} / {$tahun}",
+            'nomor_surat'       => "{$meta['kode_klasifikasi']}/0001/KT/{$romawi}/{$tahun}",
             'tanggal_surat'     => self::formatTanggalId($tglSuratRaw),
             'tahun'             => $tahun,
-            'nama_pegawai'      => $val('nama_pegawai', 'Andi Rahmat Hidayat, S.STP'),
-            'nip'               => $val('nip', '199405122020121004'),
-            'pangkat_gol'       => $val('pangkat_gol', 'Penata Muda Tk. I / III/b'),
-            'jabatan'           => $val('jabatan', 'Analis Sumber Daya Manusia Aparatur'),
-            'unit_kerja'        => $val('unit_kerja', 'Kecamatan Tamalate / Subbag Umum & Kepegawaian'),
+            'nama_pegawai'      => $val('nama_pegawai', 'A. Mila Karmila'),
+            'nip'               => $val('nip', '199509112025212056'),
+            'pangkat_gol'       => $val('pangkat_gol', 'Penata Muda Tk. I, III/b'),
+            'jabatan'           => $val('jabatan', 'Operator Layanan Operasional'),
+            'unit_kerja'        => $val('unit_kerja', 'Kecamatan Tamalate'),
+            'masa_kerja_teks'   => $val('masa_kerja_teks', '8 Tahun 10 Bulan'),
             // Cuti
-            'jenis_cuti'        => $val('jenis_cuti', 'Cuti Tahunan'),
-            'lama_hari'         => $val('lama_hari', '3'),
+            'jenis_cuti'        => $val('jenis_cuti', 'Cuti Melahirkan'),
+            'lama_hari'         => $val('lama_hari', '90 Hari'),
             'tanggal_mulai'     => self::formatTanggalId($tglMulaiRaw),
             'tanggal_selesai'   => self::formatTanggalId($tglSelesaiRaw),
-            'alasan'            => $val('alasan', 'Keperluan urusan keluarga di luar kota'),
-            'no_hp'             => $val('no_hp', '081241009988'),
+            'alasan'            => $val('alasan', 'Melahirkan / Persiapan Persalinan'),
+            'no_hp'             => $val('no_hp', '082395565653'),
+            'alamat_cuti'       => $val('alamat_cuti', 'Alamat selama menjalankan cuti'),
+            'tahun_cuti'        => $val('tahun_cuti', $tahun),
             'sisa_cuti'         => $val('sisa_cuti', '12'),
+            'keterangan_cuti'   => $val('keterangan_cuti', ''),
+            'atasan_jabatan'    => $val('atasan_jabatan', 'Kepala Seksi Pemerintahan'),
+            'atasan_nama'       => $val('atasan_nama', 'DEWI ROSITA DJAHINI, S.STP'),
+            'atasan_nip'        => $val('atasan_nip', '198301282001122001'),
+            // Surat Pengantar
+            'tujuan_surat'      => $val('tujuan_surat', $jenis === 'fasilitasi' ? 'Direktur Politeknik Pariwisata Makassar' : ($jenis === 'undangan' ? 'Lurah Se Kecamatan Tamalate' : 'Kepala Bidang Mutasi BKPSDMD Kota Makassar')),
+            'dokumen_dikirim'   => $val('dokumen_dikirim', "Berkas Permohonan Untuk Mendapatkan Tunjangan Anak\na/n : Ardiansyah Zuqur\nNIP. 19910403 202421 1 007\nPenggerak Swadaya Masyarakat Ahli Pertama"),
+            'banyaknya'         => $val('banyaknya', '1 (Satu) Berkas'),
+            'ket_pengantar'     => $val('ket_pengantar', 'Dikirim dengan hormat untuk bahan seperlunya'),
+            // Fasilitasi & Undangan
+            'sifat_surat'       => $val('sifat_surat', 'Penting'),
+            'hal_surat'         => $val('hal_surat', $jenis === 'fasilitasi' ? 'Permohonan Fasilitasi Aula' : 'Undangan'),
+            'kegiatan_rangka'   => $val('kegiatan_rangka', $jenis === 'fasilitasi'
+                ? 'Sosialisasi Pekan Panutan Pajak Bumi dan Bangunan (PBB) Tingkat Kecamatan Tamalate'
+                : 'Menindaklanjuti Hasil Bimbingan Teknis Penerapan Perwali tentang Pakaian Dinas ASN dan Tata Naskah Dinas Pemerintah Kota Makassar serta meningkatkan tertib administrasi'),
+            'hari_tanggal'      => $val('hari_tanggal', 'Rabu, 17 Juni 2026'),
+            'waktu_kegiatan'    => $val('waktu_kegiatan', $jenis === 'fasilitasi' ? '08.00 Wita - Selesai' : '09.00 Wita'),
+            'tempat_kegiatan'   => $val('tempat_kegiatan', $jenis === 'fasilitasi' ? 'Politeknik Pariwisata Makassar' : 'Aula Kantor Kecamatan Tamalate Lt. 3'),
+            'jumlah_peserta'    => $val('jumlah_peserta', '100 orang'),
+            'acara_kegiatan'    => $val('acara_kegiatan', 'Penerapan Peraturan Wali Kota (Perwali) tentang Pakaian Dinas ASN dan Tata Naskah Dinas'),
+            'pesan_penutup'     => $val('pesan_penutup', 'Diharapkan agar mengutus Sekretaris Lurah dan 1 orang staf untuk mengikuti kegiatan tersebut.'),
             // KGB
             'gaji_lama'         => $val('gaji_lama', '3.150.000'),
             'tmt_kgb_lama'      => $val('tmt_kgb_lama', '01 November 2024'),
@@ -212,9 +296,10 @@ class SuratTemplateCatalog
                 : $val('tmt_usulan', '01 April 2027'),
             'jenis_pensiun'     => $val('jenis_pensiun', 'Batas Usia Pensiun (BUP)'),
             // Penandatangan
-            'nama_camat'        => $val('nama_camat', 'H. Emil Yudianto Tadjuddin, S.STP., M.Si'),
-            'pangkat_camat'     => $val('pangkat_camat', 'Pembina Tk. I / IV/b'),
-            'nip_camat'         => $val('nip_camat', '197804151998031002'),
+            'jabatan_ttd'       => $val('jabatan_ttd', $jenis === 'fasilitasi' ? "a.n Camat\nSekretaris Camat," : 'Camat,'),
+            'nama_camat'        => $val('nama_camat', $jenis === 'fasilitasi' ? 'Saddam Musma, S.STP,M.Si' : 'Muh Aril Syahbani K., S.IP'),
+            'pangkat_camat'     => $val('pangkat_camat', $jenis === 'fasilitasi' ? 'Penata Tk I, III/d' : 'Pembina, IV/a'),
+            'nip_camat'         => $val('nip_camat', $jenis === 'fasilitasi' ? '19910705 201507 1 002' : '19880415 200701 1 001'),
         ];
     }
 

@@ -17,9 +17,9 @@
         </p>
     </div>
 
-    @if(auth()->user()?->berhakLayanan())
+    @if(auth()->user()?->berhakCuti())
         <div class="flex items-center gap-2">
-            <a href="{{ route('pengajuan.create') }}" 
+            <a href="{{ route('kepegawaian.create') }}" 
                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-700 hover:bg-primary-800 text-white font-bold text-sm shadow-card transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Buat Pengajuan Baru
@@ -87,11 +87,11 @@
             <div>
                 <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pengajuan Saya</p>
                 <div class="mt-2 text-3xl font-display font-black text-primary-950">
-                    {{ $pengajuanSaya->count() }}
+                    {{ $totalPengajuanSaya ?? $pengajuanSaya->count() }}
                     <span class="text-xs font-semibold text-slate-400 ml-1">berkas terdaftar</span>
                 </div>
                 <p class="text-xs text-slate-500 mt-2">
-                    Cuti, KGB, Kenaikan Pangkat, dan Pensiun
+                    {{ auth()->user()?->isPppkParuhWaktu() ? 'Pengajuan cuti' : 'Cuti, KGB, Kenaikan Pangkat, dan Pensiun' }}
                 </p>
             </div>
             <div class="h-12 w-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
@@ -102,6 +102,11 @@
             @if(auth()->user()?->berhakLayanan())
                 <a href="{{ route('pengajuan.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-700 hover:text-primary-800 hover:underline">
                     Lihat Semua Riwayat Pengajuan
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            @elseif(auth()->user()?->isPppkParuhWaktu())
+                <a href="{{ route('kepegawaian.index') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-700 hover:text-primary-800 hover:underline">
+                    Lihat Pengajuan Cuti
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
             @else
@@ -115,11 +120,15 @@
 <div class="rounded-2xl border border-blue-100 bg-white shadow-card overflow-hidden">
     <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
         <div>
-            <h2 class="font-display font-extrabold text-base text-primary-950">Pengajuan Terbaru</h2>
+            <h2 class="font-display font-extrabold text-base text-primary-950">{{ auth()->user()?->isPppkParuhWaktu() ? 'Pengajuan Cuti Terbaru' : 'Pengajuan Terbaru' }}</h2>
             <p class="text-xs text-slate-500">Daftar berkas permohonan kepegawaian yang baru diajukan</p>
         </div>
         @if(auth()->user()?->berhakLayanan())
             <a href="{{ route('pengajuan.index') }}" class="text-xs font-bold text-primary-700 hover:underline">
+                Lihat Semua
+            </a>
+        @elseif(auth()->user()?->isPppkParuhWaktu())
+            <a href="{{ route('kepegawaian.index') }}" class="text-xs font-bold text-primary-700 hover:underline">
                 Lihat Semua
             </a>
         @endif
@@ -137,24 +146,25 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                @forelse($pengajuanSaya as $p)
+                @forelse(($pengajuanTerbaru ?? collect()) as $item)
                 <tr class="hover:bg-blue-50/30 transition">
                     <td class="py-3.5 px-6 font-mono font-semibold text-xs text-slate-700">
-                        {{ $p->nomor_ajuan ?? '-' }}
+                        {{ $item['nomor'] }}
+                        <span class="ml-1.5 inline-flex px-2 py-0.5 rounded text-[10px] font-sans font-bold bg-slate-100 text-slate-600">{{ $item['sumber'] }}</span>
                     </td>
                     <td class="py-3.5 px-4 font-semibold text-slate-800">
-                        {{ ucfirst(str_replace('_', ' ', $p->jenis_layanan)) }}
+                        {{ $item['layanan'] }}
                     </td>
                     <td class="py-3.5 px-4">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                            {{ $p->labelStatus() }}
+                            {{ $item['status_label'] }}
                         </span>
                     </td>
                     <td class="py-3.5 px-4 text-xs text-slate-500">
-                        {{ optional($p->tanggal_ajuan)->format('d/m/Y') }}
+                        {{ $item['tanggal'] ?? '-' }}
                     </td>
                     <td class="py-3.5 px-6 text-right">
-                        <a href="{{ route('pengajuan.show', $p) }}" 
+                        <a href="{{ $item['url'] }}" 
                            class="inline-flex items-center gap-1 text-xs font-bold text-primary-700 hover:text-primary-800 hover:underline">
                             Lihat Detail →
                         </a>

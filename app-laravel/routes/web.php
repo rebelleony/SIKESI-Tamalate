@@ -96,6 +96,8 @@ Route::middleware('auth')->group(function () {
     });
 
     // Cetak SK / surat izin pengajuan yang sudah selesai menjadi PDF
+    Route::get('/pengajuan/{pengajuan}/cetak', [DokumenController::class, 'cetak'])->name('pengajuan.cetak');
+    Route::get('/pengajuan/{pengajuan}/cetak/pdf', [DokumenController::class, 'cetakPdf'])->name('pengajuan.cetak.pdf');
     Route::get('/pengajuan/{pengajuan}/dokumen', [DokumenController::class, 'pengajuan'])->name('pengajuan.dokumen');
 
     // Presensi apel (semua pegawai termasuk PPPK Paruh Waktu — ini yang diizinkan)

@@ -16,7 +16,7 @@ class DocxTemplateBuilder
     public function addKopSurat(
         string $instansi = 'PEMERINTAH KOTA MAKASSAR',
         string $unit = 'KECAMATAN TAMALATE',
-        string $alamat = 'Jalan Danau Tanjung Bunga No. 1, Makassar 90224 · Pos-el: kecamatantamalate@makassarkota.go.id'
+        string $alamat = "Jalan Danau Tanjung Bunga Utara No. 181 Makassar 90224 · Telp. +62411 - 879 249\nEmail : tamalate.bekerja22@gmail.com · Home page : http://www.kectamalate.com"
     ): self {
         $this->blocks[] = $this->p($instansi, ['align' => 'center', 'bold' => true, 'size' => 26, 'spaceAfter' => 20]);
         $this->blocks[] = $this->p($unit, ['align' => 'center', 'bold' => true, 'size' => 30, 'spaceAfter' => 40]);
